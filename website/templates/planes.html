@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{%block content %}
+
+<div class="col-md-6 offset-md-3">
+
+{% if user.is_authenticated %}
+
+<h1>Planes</h1>
+
+<table class="table table-striped table-hover table-bordered border-secondary">
+    <thead class="table-primary">
+        <tr>
+            <th scope="col">Serial Number</th>
+            <th scope="col">Manufacturer</th>
+            <th scope="col">Model</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if planes %}
+            {% for plane in planes %}
+                <tr>
+                    <td><a href="{% url 'view_plane' plane.SERIALNUM %}">{{ plane.SERIALNUM }}</a></td>
+                    <td>{{ plane.MANUFACTURER }}</td>
+                    <td>{{ plane.MODEL }}</td>
+                </tr>   
+            {%endfor%}
+        {% endif %}
+    </tbody>
+</table>
+
+{% else %}
+<div>Log In!</div>
+
+{% endif %}
+
+</div>
+
+
+{% endblock %}

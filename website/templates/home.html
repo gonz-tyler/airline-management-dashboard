@@ -1,12 +1,41 @@
 {% extends 'base.html' %}
 {%block content %}
 
-<div class="col-md-6 offset-md-3">
+
 
 {% if user.is_authenticated %}
 
-<h1>Hello World</h1>
+<h1>Flights</h1>
+<table class="table table-striped table-hover table-bordered border-secondary">
+    <thead class="table-primary">
+        <tr>
+            <th scope="col">Flight Number</th>
+            <th scope="col">Origin</th>
+            <th scope="col">Destination</th>
+            <th scope="col">Departure Time</th>
+            <th scope="col">Arrival Time</th>
+            <th scope="col">Pilot</th>
+            <th scope="col">Plane ID</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if flights %}
+            {% for flight in flights %}
+                <tr>
+                    <td><a href="{% url 'view_flight' flight.FLIGHTNUM %}">{{ flight.FLIGHTNUM }}</a></td>
+                    <td><a href="{% url 'view_city' flight.ORIGINCITYCODE.CITYCODE %}">{{ flight.ORIGINCITYCODE.CITYCODE }}</a></td>
+                    <td><a href="{% url 'view_city' flight.DESTCITYCODE.CITYCODE %}">{{ flight.DESTCITYCODE.CITYCODE }}</a></td>
+                    <td>{{ flight.DEPTIME }}</td>
+                    <td>{{ flight.ARRTIME }}</td>
+                    <td><a href="{% url 'view_pilot' flight.PILOTNUM.PILOTNUM %}">{{ flight.PILOTNUM.PILOTNUM }}</a></td>
+                    <td><a href="{% url 'view_plane' flight.PLANENUM.SERIALNUM %}">{{ flight.PLANENUM.SERIALNUM }}</a></td>
+                </tr>   
+            {%endfor%}
+        {% endif %}
+    </tbody>
+</table>
 
+<div class="col-md-6 offset-md-3"></div>
 {% else %}
 <h1>Login</h1>
 <br/>
@@ -31,3 +60,11 @@
 
 
 {% endblock %}
+
+<!--<td><a href="{% url 'view_flight' flight.FLIGHTNUM %}">{{ flight.FLIGHTNUM }}</a></td>
+                    <td><a href="{% url 'view_city' flight.ORIGINCITYCODE %}">{{ flight.ORIGINCITYCODE }}</a></td>
+                    <td><a href="{% url 'view_city' flight.DESTCITYCODE %}">{{ flight.DESTCITYCODE }}</a></td>
+                    <td>{{ flight.DEPTIME }}</td>
+                    <td>{{ flight.ARRTIME }}</td>
+                    <td><a href="{% url 'view_pilot' flight.PILOTNUM %}">{{ flight.PILOTNUM }}</a></td>
+                    <td><a href="{% url 'view_plane' flight.PLANENUM %}">{{ flight.PLANENUM }}</a></td>-->
