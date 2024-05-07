@@ -151,7 +151,9 @@ def view_flight(request, pk):
     if request.user.is_authenticated:
         #look up flight
         flight = Flight.objects.get(FLIGHTNUM=pk)
-        return render(request, 'flight_details.html', {'flight':flight})
+        passengers = PassengerBooking.objects.filter(FLIGHTNUM=pk)
+        crew = FlightCrew.objects.filter(FLIGHTNUM=pk)
+        return render(request, 'flight_details.html', {'flight':flight, 'passengers': passengers, 'crew': crew})
     else:
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')
@@ -242,9 +244,11 @@ def view_passengers(request):
 
 def view_passenger(request, pk):
     if request.user.is_authenticated:
-        #look up passenger
         passenger = Passenger.objects.get(PASSENGERNUM=pk)
-        return render(request, 'passenger_details.html', {'passenger':passenger})
+        bookings = PassengerBooking.objects.filter(PASSENGERNUM=pk)
+        addresses = PassengerAddress.objects.filter(PASSENGERNUM=pk)
+        phones = PassengerPhone.objects.filter(PASSENGERNUM=pk)
+        return render(request, 'passenger_details.html', {'passenger': passenger, 'bookings': bookings, 'addresses': addresses, 'phones': phones})
     else:
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')
@@ -350,7 +354,10 @@ def view_staff_member(request, pk):
     if request.user.is_authenticated:
         #look up staff_member
         staff_member = Staff.objects.get(EMPNUM=pk)
-        return render(request, 'staff_details.html', {'staff_member':staff_member})
+        addresses = StaffAddress.objects.filter(EMPNUM=pk)
+        phones = StaffPhone.objects.filter(EMPNUM=pk)
+        flights = Flight.objects.filter(flightcrew__EMPNUM=pk)
+        return render(request, 'staff_details.html', {'staff_member': staff_member, 'addresses': addresses, 'phones': phones, 'flights': flights})
     else:
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')

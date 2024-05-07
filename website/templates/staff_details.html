@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="card">
+    <h5 class="card-header">Staff Member {{ staff_member.EMPNUM }} </h5>
+    <div class="card-body">
+        <p class="list-group-item"><strong>Name: </strong>{{ staff_member.NAME }}</p>
+        <p class="list-group-item"><strong>Surname: </strong>{{ staff_member.SURNAME }}</p>
+        <p class="list-group-item"><strong>Position: </strong>{{ staff_member.TYPE }}</p>
+
+        <h5>Addresses:</h5>
+        <ul>
+            {% for address in addresses %}
+                <li>{{ address.ADDRESS }}</li>
+            {% endfor %}
+        </ul>
+
+        <h5>Phones:</h5>
+        <ul>
+            {% for phone in phones %}
+                <li>{{ phone.PHONE }}</li>
+            {% endfor %}
+        </ul>
+
+        <h5>Associated Flights:</h5>
+        <ul>
+            {% for flight in flights %}
+                <li>Flight Number: {{ flight.FLIGHTNUM }}</li>
+                <!-- Display other flight details as needed -->
+            {% endfor %}
+        </ul>
+
+        <a onclick="history.back()" class="btn btn-secondary">Back</a>
+    </div>
+</div>
+
+{% endblock %}

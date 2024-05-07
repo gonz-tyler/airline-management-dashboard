@@ -1,8 +1,8 @@
-{%extends 'base.html' %}
-{%block content%}
+{% extends 'base.html' %}
+{% block content %}
 
 <div class="card">
-    <h5 class="card-header">Flight Number {{flight.FLIGHTNUM}} </h5>
+    <h5 class="card-header">Flight Number {{ flight.FLIGHTNUM }} </h5>
     <div class="card-body">
         <p class="list-group-item"><strong>Origin: </strong>{{ flight.ORIGINCITYCODE.CITYCODE }}</p>
         <p class="list-group-item"><strong>Destination: </strong>{{ flight.DESTCITYCODE.CITYCODE }}</p>
@@ -10,9 +10,26 @@
         <p class="list-group-item"><strong>Arrival Time: </strong>{{ flight.ARRTIME }}</p>
         <p class="list-group-item"><strong>Pilot: </strong>{{ flight.PILOTNUM.PILOTNUM }}</p>
         <p class="list-group-item"><strong>Plane: </strong>{{ flight.PLANENUM.SERIALNUM }}</p>
+        {% if passengers %}
+        <h5>Passengers:</h5>
+        <ul>
+            {% for passenger in passengers %}
+                <li>{{ passenger.NAME }} {{ passenger.SURNAME }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% if crew %}
+        <h5>Crew:</h5>
+        <ul>
+            {% for crew_member in crew %}
+                <li>{{ crew_member.EMPNUM.NAME }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        
         <a onclick="history.back()" class="btn btn-secondary">Back</a>
         <a href="{% url 'delete_flight' flight.FLIGHTNUM %}" class="btn btn-danger">Delete</a>
     </div>
-  </div>
+</div>
 
-{%endblock%}
+{% endblock %}

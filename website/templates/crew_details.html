@@ -1,0 +1,14 @@
+{%extends 'base.html' %}
+{%block content%}
+
+<div class="card">
+    <h5 class="card-header">Flight Assignment for Employee {{crew.EMPNUM}} </h5>
+    <div class="card-body">
+        <p class="list-group-item"><strong>Flight: </strong>{{ crew.FLIGHTNUM }}</p>
+
+        <a onclick="history.back()" class="btn btn-secondary">Back</a>
+        <!-- <a href="{% url 'delete_pilot' pilot.PILOTNUM %}" class="btn btn-danger">Delete</a> -->
+    </div>
+  </div>
+
+{%endblock%}

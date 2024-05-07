@@ -1,0 +1,14 @@
+{%extends 'base.html' %}
+{%block content%}
+
+<div class="card">
+    <h5 class="card-header">Passenger Number {{address.PASSENGERNUM}} </h5>
+    <div class="card-body">
+        <p class="list-group-item"><strong>Address: </strong>{{ address.ADDRESS }}</p>
+
+        <a onclick="history.back()" class="btn btn-secondary">Back</a>
+        <!-- <a href="{% url 'delete_city' city.CITYCODE %}" class="btn btn-danger">Delete</a> -->
+    </div>
+  </div>
+
+{%endblock%}

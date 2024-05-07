@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="card">
+    <h5 class="card-header">Passenger Number {{ passenger.PASSENGERNUM }} </h5>
+    <div class="card-body">
+        <p class="list-group-item"><strong>Name: </strong>{{ passenger.NAME }}</p>
+        <p class="list-group-item"><strong>Surname: </strong>{{ passenger.SURNAME }}</p>
+        {% if bookings %}
+            <h5>Bookings:</h5>
+            <h1>Flights</h1>
+            <table class="table table-striped table-hover table-bordered border-secondary">
+                <thead class="table-primary">
+                    <tr>
+                        <th scope="col">Flight Number</th>
+                        <th scope="col">Origin</th>
+                        <th scope="col">Destination</th>
+                        <th scope="col">Departure Time</th>
+                        <th scope="col">Arrival Time</th>
+                        <th scope="col">Pilot</th>
+                        <th scope="col">Plane ID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                        {% for booking in bookings %}
+                            <tr>
+                                <td><a href="{% url 'view_flight' flight.FLIGHTNUM %}">{{ booking.FLIGHTNUM }}</a></td>
+                                <td><a href="{% url 'view_city' flight.ORIGINCITYCODE.CITYCODE %}">{{ booking.FLIGHTNUM.ORIGINCITYCODE.CITYCODE }}</a></td>
+                                <td><a href="{% url 'view_city' flight.DESTCITYCODE.CITYCODE %}">{{ booking.FLIGHTNUM.DESTCITYCODE.CITYCODE }}</a></td>
+                                <td>{{ booking.FLIGHTNUM.DEPTIME }}</td>
+                                <td>{{ booking.FLIGHTNUM.ARRTIME }}</td>
+                                <td><a href="{% url 'view_pilot' flight.PILOTNUM.PILOTNUM %}">{{ booking.FLIGHTNUM.PILOTNUM.PILOTNUM }}</a></td>
+                                <td><a href="{% url 'view_plane' flight.PLANENUM.SERIALNUM %}">{{ booking.FLIGHTNUM.PLANENUM.SERIALNUM }}</a></td>
+                            </tr>   
+                        {%endfor%}
+                    {% endif %}
+                </tbody>
+            </table>
+        {% endif %}
+        {% if addresses %}
+        <h5>Addresses:</h5>
+        <ul>
+            {% for address in addresses %}
+                <li>{{ address.ADDRESS }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% if phones %}
+        <h5>Phones:</h5>
+        <ul>
+            {% for phone in phones %}
+                <li>{{ phone.PHONE }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <a onclick="history.back()" class="btn btn-secondary">Back</a>
+        <a href="{% url 'delete_passenger' passenger.PASSENGERNUM %}" class="btn btn-danger">Delete</a>
+    </div>
+</div>
+
+{% endblock %}
