@@ -51,8 +51,8 @@ urlpatterns = [
 
     #-- passenger --#
     path('passengers/', views.view_passengers, name='view_passengers'),
-    path('passenger/<int:pk>', views.view_pilot, name='view_passenger'),
-    path('delete_passenger/<int:pk>', views.delete_pilot, name='delete_passenger'),
+    path('passengers/<int:pk>', views.view_passenger, name='view_passenger'),
+    path('delete_passenger/<int:pk>', views.delete_passenger, name='delete_passenger'),
     path('add_passenger', views.add_passenger, name='add_passenger'),
 
     #-- pilot typeratings --#

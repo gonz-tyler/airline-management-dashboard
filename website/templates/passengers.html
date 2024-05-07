@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{%block content %}
+
+<div class="col-md-6 offset-md-3">
+
+{% if user.is_authenticated %}
+
+<h1>Passengers</h1>
+
+<table class="table table-striped table-hover table-bordered border-secondary">
+    <thead class="table-primary">
+        <tr>
+            <th scope="col">Passenger Number</th>
+            <th scope="col">Name</th>
+            <th scope="col">Surname</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if passengers %}
+            {% for passenger in passengers %}
+                <tr>
+                    <td>{{ passenger.PASSENGERNUM }}</td>
+                    <td>{{ passenger.NAME }}</td>
+                    <td>{{ passenger.SURNAME }}</td>
+                </tr>   
+            {%endfor%}
+        {% endif %}
+    </tbody>
+</table>
+
+{% else %}
+<div>Log In!</div>
+
+{% endif %}
+
+</div>
+
+
+{% endblock %}

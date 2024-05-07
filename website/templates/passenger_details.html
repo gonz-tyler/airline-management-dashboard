@@ -8,7 +8,6 @@
         <p class="list-group-item"><strong>Surname: </strong>{{ passenger.SURNAME }}</p>
         {% if bookings %}
             <h5>Bookings:</h5>
-            <h1>Flights</h1>
             <table class="table table-striped table-hover table-bordered border-secondary">
                 <thead class="table-primary">
                     <tr>
@@ -24,16 +23,15 @@
                 <tbody>
                         {% for booking in bookings %}
                             <tr>
-                                <td><a href="{% url 'view_flight' flight.FLIGHTNUM %}">{{ booking.FLIGHTNUM }}</a></td>
-                                <td><a href="{% url 'view_city' flight.ORIGINCITYCODE.CITYCODE %}">{{ booking.FLIGHTNUM.ORIGINCITYCODE.CITYCODE }}</a></td>
-                                <td><a href="{% url 'view_city' flight.DESTCITYCODE.CITYCODE %}">{{ booking.FLIGHTNUM.DESTCITYCODE.CITYCODE }}</a></td>
+                                <td><a href="{% url 'view_flight' booking.FLIGHTNUM.FLIGHTNUM %}">{{ booking.FLIGHTNUM.FLIGHTNUM }}</a></td>
+                                <td><a href="{% url 'view_city' booking.FLIGHTNUM.ORIGINCITYCODE.CITYCODE %}">{{ booking.FLIGHTNUM.ORIGINCITYCODE.CITYCODE }}</a></td>
+                                <td><a href="{% url 'view_city' booking.FLIGHTNUM.DESTCITYCODE.CITYCODE %}">{{ booking.FLIGHTNUM.DESTCITYCODE.CITYCODE }}</a></td>
                                 <td>{{ booking.FLIGHTNUM.DEPTIME }}</td>
                                 <td>{{ booking.FLIGHTNUM.ARRTIME }}</td>
-                                <td><a href="{% url 'view_pilot' flight.PILOTNUM.PILOTNUM %}">{{ booking.FLIGHTNUM.PILOTNUM.PILOTNUM }}</a></td>
-                                <td><a href="{% url 'view_plane' flight.PLANENUM.SERIALNUM %}">{{ booking.FLIGHTNUM.PLANENUM.SERIALNUM }}</a></td>
-                            </tr>   
+                                <td><a href="{% url 'view_pilot' booking.FLIGHTNUM.PILOTNUM.PILOTNUM %}">{{ booking.FLIGHTNUM.PILOTNUM.PILOTNUM }}</a></td>
+                                <td><a href="{% url 'view_plane' booking.FLIGHTNUM.PLANENUM.SERIALNUM %}">{{ booking.FLIGHTNUM.PLANENUM.SERIALNUM }}</a></td>
+                            </tr>
                         {%endfor%}
-                    {% endif %}
                 </tbody>
             </table>
         {% endif %}
@@ -41,7 +39,7 @@
         <h5>Addresses:</h5>
         <ul>
             {% for address in addresses %}
-                <li>{{ address.ADDRESS }}</li>
+                <li>{{ address.ADDRESSDETAILS }}</li>
             {% endfor %}
         </ul>
         {% endif %}
