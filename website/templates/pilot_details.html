@@ -1,9 +1,23 @@
 {%extends 'base.html' %}
 {%block content%}
 
-    <h1>Plane Details:</h1>
-    {{ plane.SERIALNUM }}
-    {{ plane.MANUFACTURER }}
-    {{ plane.MODEL }}
+<div class="card">
+    <h5 class="card-header">Pilot Number {{pilot.PILOTNUM}} </h5>
+    <div class="card-body">
+        <p class="list-group-item"><strong>Name: </strong>{{ pilot.EMPNUM.NAME }}</p>
+        <p class="list-group-item"><strong>Surname: </strong>{{ pilot.EMPNUM.SURNAME }}</p>
+        <p class="list-group-item"><strong>Salary: </strong>${{ pilot.EMPNUM.SALARY }}</p>
+        {% if typeratings %}
+          {% for typerating in typeratings %}
+          <p class="list-group-item"><strong>Typerating(s): </strong>{{ typerating.TYPERATING }}    {{ typerating.DATEEARNED }}</p>
+          {% endfor %}
+        {% endif %}
+        <p class="list-group-item"><strong>Name: </strong>{{ pilot.EMPNUM.NAME }}</p>
+        <p class="list-group-item"><strong>Name: </strong>{{ pilot.EMPNUM.NAME }}</p>
+
+        <a onclick="history.back()" class="btn btn-secondary">Back</a>
+        <a href="{% url 'delete_pilot' pilot.PILOTNUM %}" class="btn btn-danger">Delete</a>
+    </div>
+  </div>
 
 {%endblock%}
