@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import SignUpForm
@@ -94,7 +94,16 @@ def view_city(request, pk):
         return redirect('home')
     
 def delete_city(request, pk):
-    pass
+    if request.user.is_authenticated:
+        delete_it = City.objects.get(CITYCODE=pk)
+        city_code = delete_it.CITYCODE
+        delete_it.delete()
+        messages.success(request, f"City {city_code} Deleted Successfully")
+        city_code = None
+        return redirect('home')
+    else:
+        messages.success(request, "You must be logged in to perform this action.")
+        return redirect('home')
 
 def add_city(request):
     pass
@@ -105,17 +114,29 @@ def view_crews(request):
         crews = FlightCrew.objects.all()
         return render(request, 'crews.html', {'crews': crews})
 
-def view_crew(request, pk):
+def view_crew(request, flight_number, employee_number):
     if request.user.is_authenticated:
         #look up city
-        crew = FlightCrew.objects.get(EMPNUM=pk)
+        crew = FlightCrew.objects.get(FLIGHTNUM=flight_number, EMPNUM=employee_number)
         return render(request, 'crew_details.html', {'crew':crew})
     else:
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')
     
-def delete_crew(request, pk):
-    pass
+def delete_crew(request, flight_number, employee_number):
+    if request.user.is_authenticated:
+        # Get the FlightCrew object with the given flight number and employee number
+        delete_it = FlightCrew.objects.get(FLIGHTNUM=flight_number, EMPNUM=employee_number)
+        # Delete the FlightCrew object
+        delete_it.delete()
+        # Add a success message
+        messages.success(request, f"Flight crew with flight number {flight_number} and employee number {employee_number} deleted successfully.")
+        # Redirect to the desired page (e.g., home)
+        return redirect('home')
+    else:
+        # Add a message for unauthenticated users
+        messages.error(request, "You must be logged in to perform this action.")
+        return redirect('home')
 
 def add_crew(request):
     pass
@@ -156,11 +177,11 @@ def view_passenger_addresses(request):
         passenger_addresses = PassengerAddress.objects.all()
         return render(request, 'passenger_addresses.html', {'passenger_addresses': passenger_addresses})
 
-def view_passenger_address(request, pk):
+def view_passenger_address(request, passenger_num, passenger_address):
     if request.user.is_authenticated:
-        #look up city
-        city = City.objects.get(CITYCODE=pk)
-        return render(request, 'city_details.html', {'city':city})
+        #look up address
+        address = PassengerAddress.objects.get(PASSENGERNUM=passenger_num, ADDRESS=passenger_address)
+        return render(request, 'passenger_address_details.html', {'address':address})
     else:
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')
@@ -174,14 +195,14 @@ def add_passenger_address(request):
 #-- Passenger Bookings --#    
 def view_passenger_bookings(request):
     if request.user.is_authenticated:
-        cities = City.objects.all()
-        return render(request, 'cities.html', {'cities': cities})
+        bookings = PassengerBooking.objects.all()
+        return render(request, 'bookings.html', {'bookings': bookings})
 
-def view_passenger_booking(request, pk):
+def view_passenger_booking(request, passenger_num, flight_num):
     if request.user.is_authenticated:
-        #look up city
-        city = City.objects.get(CITYCODE=pk)
-        return render(request, 'city_details.html', {'city':city})
+        #look up booking
+        booking = PassengerBooking.objects.get(PASSENGERNUM=passenger_num, FIGHTNUM=flight_num)
+        return render(request, 'booking_details.html', {'booking':booking})
     else:
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')
@@ -195,14 +216,14 @@ def add_passenger_booking(request):
 #-- Passenger Phones --#    
 def view_passenger_phones(request):
     if request.user.is_authenticated:
-        cities = City.objects.all()
-        return render(request, 'cities.html', {'cities': cities})
+        passenger_phones = PassengerPhone.objects.all()
+        return render(request, 'passenger_phones.html', {'passenger_phones': passenger_phones})
 
 def view_passenger_phone(request, pk):
     if request.user.is_authenticated:
         #look up city
-        city = City.objects.get(CITYCODE=pk)
-        return render(request, 'city_details.html', {'city':city})
+        passenger_phone = PassengerPhone.objects.get(PHONE=pk)
+        return render(request, 'passenger_phone_details.html', {'passenger_phone':passenger_phone})
     else:
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')
@@ -216,14 +237,14 @@ def add_passenger_phone(request):
 #-- Passengers --#    
 def view_passengers(request):
     if request.user.is_authenticated:
-        cities = City.objects.all()
-        return render(request, 'cities.html', {'cities': cities})
+        passengers = Passenger.objects.all()
+        return render(request, 'passengers.html', {'passengers': passengers})
 
 def view_passenger(request, pk):
     if request.user.is_authenticated:
-        #look up city
-        city = City.objects.get(CITYCODE=pk)
-        return render(request, 'city_details.html', {'city':city})
+        #look up passenger
+        passenger = Passenger.objects.get(PASSENGERNUM=pk)
+        return render(request, 'passenger_details.html', {'passenger':passenger})
     else:
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')
@@ -234,17 +255,16 @@ def delete_passenger(request, pk):
 def add_passenger(request):
     pass
 
-#-- Pilot Typeratings --#    
+#-- Pilot Typeratings --#
 def view_pilot_typeratings(request):
     if request.user.is_authenticated:
-        cities = City.objects.all()
-        return render(request, 'cities.html', {'cities': cities})
+        typeratings = PilotTypeRating.objects.all()
+        return render(request, 'typeratings.html', {'typeratings': typeratings})
 
-def view_pilot_typerating(request, pk):
+def view_pilot_typerating(request, pilot_num, typerating):
     if request.user.is_authenticated:
-        #look up city
-        city = City.objects.get(CITYCODE=pk)
-        return render(request, 'city_details.html', {'city':city})
+        pilot_typerating = PilotTypeRating.objects.get(PILOTNUM=pilot_num, TYPERATING=typerating)
+        return render(request, 'typerating_details.html', {'pilot_typerating': pilot_typerating})
     else:
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')
@@ -278,17 +298,17 @@ def delete_pilot(request, pk):
 def add_pilot(request):
     pass
 
-#-- Staff Addresses --#    
+#-- Staff Addresses --#
 def view_staff_addresses(request):
     if request.user.is_authenticated:
-        cities = City.objects.all()
-        return render(request, 'cities.html', {'cities': cities})
+        staff_addresses = StaffAddress.objects.all()
+        return render(request, 'staff_addresses.html', {'staff_addresses': staff_addresses})
 
-def view_staff_address(request, pk):
+def view_staff_address(request, emp_num, address_details):
     if request.user.is_authenticated:
         #look up city
-        city = City.objects.get(CITYCODE=pk)
-        return render(request, 'city_details.html', {'city':city})
+        staff_address = StaffAddress.objects.get(EMPNUM=emp_num, ADDRESSDETAILS=address_details)
+        return render(request, 'staff_address_details.html', {'staff_address':staff_address})
     else:
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')
@@ -302,14 +322,14 @@ def add_staff_address(request):
 #-- Staff Phones --#    
 def view_staff_phones(request):
     if request.user.is_authenticated:
-        cities = City.objects.all()
-        return render(request, 'cities.html', {'cities': cities})
+        phones = StaffPhone.objects.all()
+        return render(request, 'staff_phones.html', {'phones': phones})
 
 def view_staff_phone(request, pk):
     if request.user.is_authenticated:
-        #look up city
-        city = City.objects.get(CITYCODE=pk)
-        return render(request, 'city_details.html', {'city':city})
+        #look up staff phone
+        staff_phone = StaffPhone.objects.get(PHONE=pk)
+        return render(request, 'staff_phone_details.html', {'staff_phone': staff_phone})
     else:
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')
@@ -323,14 +343,14 @@ def add_staff_phone(request):
 #-- Staff --#    
 def view_staff(request):
     if request.user.is_authenticated:
-        cities = City.objects.all()
-        return render(request, 'cities.html', {'cities': cities})
+        staff = Staff.objects.all()
+        return render(request, 'staff.html', {'staff': staff})
 
 def view_staff_member(request, pk):
     if request.user.is_authenticated:
-        #look up city
-        city = City.objects.get(CITYCODE=pk)
-        return render(request, 'city_details.html', {'city':city})
+        #look up staff_member
+        staff_member = Staff.objects.get(EMPNUM=pk)
+        return render(request, 'staff_details.html', {'staff_member':staff_member})
     else:
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')
@@ -344,14 +364,14 @@ def add_staff_member(request):
 #-- Stretch --#    
 def view_stretches(request):
     if request.user.is_authenticated:
-        cities = City.objects.all()
-        return render(request, 'cities.html', {'cities': cities})
+        stretches = Stretch.objects.all()
+        return render(request, 'stretches.html', {'stretches': stretches})
 
 def view_stretch(request, pk):
     if request.user.is_authenticated:
-        #look up city
-        city = City.objects.get(CITYCODE=pk)
-        return render(request, 'city_details.html', {'city':city})
+        #look up stretch
+        stretch = Stretch.objects.get(STRETCHNUM=pk)
+        return render(request, 'stretch_details.html', {'stretch':stretch})
     else:
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')
