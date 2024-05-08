@@ -34,14 +34,14 @@ urlpatterns = [
     #-- passenger address --#
     path('passenger_addresses/', views.view_passenger_addresses, name='view_passenger_addresses'),
     path('passenger_addresses/<int:pk>', views.view_passenger_address, name='view_passenger_address'),
-    path('delete_passenger_address/<int:pk>', views.delete_passenger_address, name='delete_passenger_address'),
+    path('delete_passenger_address/<int:pk1>/<str:pk2>', views.delete_passenger_address, name='delete_passenger_address'),
     path('add_passenger_address', views.add_passenger_address, name='add_passenger_address'),
 
     #-- passenger booking --#
-    path('pilots/', views.view_pilots, name='view_pilots'),
-    path('pilots/<int:pk>', views.view_pilot, name='view_pilot'),
-    path('delete_pilot/<int:pk>', views.delete_pilot, name='delete_pilot'),
-    path('add_pilot', views.add_pilot, name='add_pilot'),
+    path('bookings/', views.view_passenger_bookings, name='view_passenger_bookings'),
+    path('bookings/<int:pk>', views.view_passenger_booking, name='view_passenger_booking'),
+    path('delete_booking/<int:pk>', views.delete_passenger_booking, name='delete_passenger_booking'),
+    path('add_booking', views.add_passenger_booking, name='add_passenger_booking'),
 
     #-- passenger phone --#
     path('passenger_phones/', views.view_passenger_phones, name='view_passenger_phones'),
@@ -70,7 +70,7 @@ urlpatterns = [
     #-- staff addresses --#
     path('staff_addresses/', views.view_staff_addresses, name='view_staff_addresses'),
     path('staff_addresses/<int:pk>', views.view_staff_address, name='view_staff_address'),
-    path('delete_staff_address/<int:pk>', views.delete_staff_address, name='delete_staff_address'),
+    path('delete_staff_address/<int:pk>/<str:pk2>', views.delete_staff_address, name='delete_staff_address'),
     path('add_staff_address', views.add_staff_address, name='add_staff_address'),
 
     #-- staff phones --#
@@ -81,8 +81,8 @@ urlpatterns = [
     
     #-- staff --#
     path('staff/', views.view_staff, name='view_staff'),
-    path('staff/<int:pk>', views.view_staff_member, name='view_staff_members'),
-    path('delete_staff/<int:pk>', views.delete_staff_member, name='delete_staff'),
+    path('staff/<int:pk>', views.view_staff_member, name='view_staff_member'),
+    path('delete_staff/<int:pk>', views.delete_staff_member, name='delete_staff_member'),
     path('add_staff', views.add_staff_member, name='add_staff'),
     
     #-- stretch --#

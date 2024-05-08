@@ -10,6 +10,24 @@
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'logout' %}">Logout</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'view_planes' %}">Planes</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'view_pilots' %}">Pilots</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'view_staff' %}">Staff</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'view_cities' %}">Cities</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'view_passengers' %}">Passengers</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'view_passenger_bookings' %}">Bookings</a>
+            </li>
             {% else %}
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'register' %}">Register</a>
@@ -18,21 +36,6 @@
                 <a class="nav-link" href="{% url 'home' %}">Login</a>
             </li>
             {% endif %}
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'view_planes' %}">Planes</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'view_planes' %}">Pilots</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'view_planes' %}">Staff</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'view_planes' %}">Cities</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'view_passengers' %}">Passengers</a>
-            </li>
         </ul>
       </div>
     </div>

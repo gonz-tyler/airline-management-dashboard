@@ -7,7 +7,9 @@
         <p class="list-group-item"><strong>Flight: </strong>{{ crew.FLIGHTNUM }}</p>
 
         <a onclick="history.back()" class="btn btn-secondary">Back</a>
-        <!-- <a href="{% url 'delete_pilot' pilot.PILOTNUM %}" class="btn btn-danger">Delete</a> -->
+        {% if user.is_superuser %}
+        <a href="{% url 'delete_crew' crew.EMPNUM crew.FLIGHTNUM %}" class="btn btn-danger">Delete</a>
+        {% endif %}
     </div>
   </div>
 

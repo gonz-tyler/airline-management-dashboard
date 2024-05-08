@@ -7,16 +7,62 @@
         <p class="list-group-item"><strong>Name: </strong>{{ pilot.EMPNUM.NAME }}</p>
         <p class="list-group-item"><strong>Surname: </strong>{{ pilot.EMPNUM.SURNAME }}</p>
         <p class="list-group-item"><strong>Salary: </strong>${{ pilot.EMPNUM.SALARY }}</p>
+        <h5>Addresses:</h5>
+        <ul>
+            {% for address in addresses %}
+                <li>{{ address.ADDRESSDETAILS }}</li>
+            {% endfor %}
+        </ul>
+
+        <h5>Phones:</h5>
+        <ul>
+            {% for phone in phones %}
+                <li>{{ phone.PHONE }}</li>
+            {% endfor %}
+        </ul>
         {% if typeratings %}
-          {% for typerating in typeratings %}
-          <p class="list-group-item"><strong>Typerating(s): </strong>{{ typerating.TYPERATING }}    {{ typerating.DATEEARNED }}</p>
-          {% endfor %}
+          <h5>Type Ratings:</h5>
+          <ul>
+              {% for typerating in typeratings %}
+                  <li>{{ typerating.TYPERATING }}    {{ typerating.DATEEARNED }}</li>
+              {% endfor %}
+          </ul>
         {% endif %}
-        <p class="list-group-item"><strong>Name: </strong>{{ pilot.EMPNUM.NAME }}</p>
-        <p class="list-group-item"><strong>Name: </strong>{{ pilot.EMPNUM.NAME }}</p>
+        
+        {% if flights %}
+            <h5>Associated Flights:</h5>
+            <table class="table table-striped table-hover table-bordered border-secondary">
+                <thead class="table-primary">
+                    <tr>
+                        <th scope="col">Flight Number</th>
+                        <th scope="col">Origin</th>
+                        <th scope="col">Destination</th>
+                        <th scope="col">Departure Time</th>
+                        <th scope="col">Arrival Time</th>
+                        <th scope="col">Pilot</th>
+                        <th scope="col">Plane ID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                        {% for flight in flights %}
+                            <tr>
+                                <td><a href="{% url 'view_flight' flight.FLIGHTNUM %}">{{ flight.FLIGHTNUM }}</a></td>
+                                <td><a href="{% url 'view_city' flight.ORIGINCITYCODE.CITYCODE %}">{{ flight.ORIGINCITYCODE.CITYCODE }}</a></td>
+                                <td><a href="{% url 'view_city' flight.DESTCITYCODE.CITYCODE %}">{{ flight.DESTCITYCODE.CITYCODE }}</a></td>
+                                <td>{{ flight.DEPTIME }}</td>
+                                <td>{{ flight.ARRTIME }}</td>
+                                <td><a href="{% url 'view_pilot' flight.PILOTNUM.PILOTNUM %}">{{ flight.PILOTNUM.PILOTNUM }}</a></td>
+                                <td><a href="{% url 'view_plane' flight.PLANENUM.SERIALNUM %}">{{ flight.PLANENUM.SERIALNUM }}</a></td>
+                            </tr>
+                        {%endfor%}
+                </tbody>
+            </table>
+        {% endif %}
 
         <a onclick="history.back()" class="btn btn-secondary">Back</a>
+        {% if user.is_superuser %}
         <a href="{% url 'delete_pilot' pilot.PILOTNUM %}" class="btn btn-danger">Delete</a>
+        {% endif %}
     </div>
   </div>
 

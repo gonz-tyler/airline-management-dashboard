@@ -291,7 +291,10 @@ def view_pilot(request, pk):
         pilot = Pilot.objects.get(PILOTNUM=pk)
         # Get all type ratings for the pilot
         typeratings = PilotTypeRating.objects.filter(PILOTNUM=pilot)
-        return render(request, 'pilot_details.html', {'pilot': pilot, 'typeratings': typeratings})
+        addresses = StaffAddress.objects.filter(EMPNUM=pilot.EMPNUM)
+        phones = StaffPhone.objects.filter(EMPNUM=pilot.EMPNUM)
+        flights = Flight.objects.filter(PILOTNUM=pk)
+        return render(request, 'pilot_details.html', {'pilot': pilot, 'typeratings': typeratings, 'addresses': addresses, 'phones': phones, 'flights': flights})
     else:
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')
@@ -317,8 +320,20 @@ def view_staff_address(request, emp_num, address_details):
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')
     
-def delete_staff_address(request, pk):
-    pass
+def delete_staff_address(request, empnum, address):
+    if request.user.is_authenticated:
+        # Get the FlightCrew object with the given flight number and employee number
+        delete_it = StaffAddress.objects.get(EMPNUM=empnum, ADDRESSDETAILS=address)
+        # Delete the FlightCrew object
+        delete_it.delete()
+        # Add a success message
+        messages.success(request, f"Staff address with employee number {empnum} and address details {address} deleted successfully.")
+        # Redirect to the desired page (e.g., home)
+        return redirect('home')
+    else:
+        # Add a message for unauthenticated users
+        messages.error(request, "You must be logged in to perform this action.")
+        return redirect('home')
 
 def add_staff_address(request):
     pass
