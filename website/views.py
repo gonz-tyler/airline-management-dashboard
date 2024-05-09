@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .forms import SignUpForm
+from .forms import *
 from .models import *
 
 #-- Render Home Page --#
@@ -76,7 +76,17 @@ def delete_plane(request, pk):
         return redirect('home')
     
 def add_plane(request):
-    pass
+    form = AddAirplaneForm(request.POST or None)
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            if form.is_valid():
+                add_plane = form.save()
+                messages.success(request, f"Record Added...")
+                return redirect("home")
+        return render(request, 'add_plane.html', {"form": form})
+    else:
+        messages.success(request, f"You must be logged in...")
+        return redirect("home")
 
 #-- Cities --#    
 def view_cities(request):
@@ -106,7 +116,17 @@ def delete_city(request, pk):
         return redirect('home')
 
 def add_city(request):
-    pass
+    form = AddCityForm(request.POST or None)
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            if form.is_valid():
+                add_city = form.save()
+                messages.success(request, f"Record Added...")
+                return redirect("home")
+        return render(request, 'add_city.html', {"form": form})
+    else:
+        messages.success(request, f"You must be logged in...")
+        return redirect("home")
 
 #-- Flight Crews --#    
 def view_crews(request):
@@ -139,7 +159,17 @@ def delete_crew(request, flight_number, employee_number):
         return redirect('home')
 
 def add_crew(request):
-    pass
+    form = AddFlightCrewForm(request.POST or None)
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            if form.is_valid():
+                add_crew = form.save()
+                messages.success(request, f"Record Added...")
+                return redirect("home")
+        return render(request, 'add_crew.html', {"form": form})
+    else:
+        messages.success(request, f"You must be logged in...")
+        return redirect("home")
 
 #-- Flights --#
 def view_flights(request):
@@ -171,7 +201,17 @@ def delete_flight(request, pk):
         return redirect('home')
 
 def add_flight(request):
-    return render(request, 'add_flight.html')
+    form = AddFlightForm(request.POST or None)
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            if form.is_valid():
+                add_flight = form.save()
+                messages.success(request, f"Record Added...")
+                return redirect("home")
+        return render(request, 'add_flight.html', {"form": form})
+    else:
+        messages.success(request, f"You must be logged in...")
+        return redirect("home")
 
 #-- Passenger Addresses --#    
 def view_passenger_addresses(request):
@@ -182,17 +222,37 @@ def view_passenger_addresses(request):
 def view_passenger_address(request, passenger_num, passenger_address):
     if request.user.is_authenticated:
         #look up address
-        address = PassengerAddress.objects.get(PASSENGERNUM=passenger_num, ADDRESS=passenger_address)
+        address = PassengerAddress.objects.get(PASSENGERNUM=passenger_num, ADDRESSDETAILS=passenger_address)
         return render(request, 'passenger_address_details.html', {'address':address})
     else:
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')
     
-def delete_passenger_address(request, pk):
-    pass
+def delete_passenger_address(request, passenger_num, passenger_address):
+    if request.user.is_authenticated:
+        delete_it = PassengerAddress.objects.get(PASSENGERNUM=passenger_num, ADDRESSDETAILS=passenger_address)
+        delete_it.delete()
+        # Add a success message
+        messages.success(request, f"Passenger address with address {passenger_address} and passenger number {passenger_num} deleted successfully.")
+        # Redirect to the desired page (e.g., home)
+        return redirect('home')
+    else:
+        # Add a message for unauthenticated users
+        messages.error(request, "You must be logged in to perform this action.")
+        return redirect('home')
 
 def add_passenger_address(request):
-    pass
+    form = AddPassengerAddressForm(request.POST or None)
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            if form.is_valid():
+                add_passenger_address = form.save()
+                messages.success(request, f"Record Added...")
+                return redirect("home")
+        return render(request, 'add_passenger_address.html', {"form": form})
+    else:
+        messages.success(request, f"You must be logged in...")
+        return redirect("home")
 
 #-- Passenger Bookings --#    
 def view_passenger_bookings(request):
@@ -209,11 +269,30 @@ def view_passenger_booking(request, passenger_num, flight_num):
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')
     
-def delete_passenger_booking(request, pk):
-    pass
+def delete_passenger_booking(request, passenger_num, flight_num):
+    if request.user.is_authenticated:
+        delete_it = PassengerBooking.objects.get(PASSENGERNUM=passenger_num, FIGHTNUM=flight_num)
+        delete_it.delete()
+        # Add a success message
+        messages.success(request, f"Passenger booking with flight number {flight_num} and passenger number {passenger_num} deleted successfully.")
+        # Redirect to the desired page (e.g., home)
+        return redirect('home')
+    else:
+        messages.success(request, 'You must be logged in to perform this action.')
+        return redirect('home')
 
 def add_passenger_booking(request):
-    pass
+    form = AddPassengerBookingForm(request.POST or None)
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            if form.is_valid():
+                add_passenger_booking = form.save()
+                messages.success(request, f"Record Added...")
+                return redirect("home")
+        return render(request, 'add_passenger_booking.html', {"form": form})
+    else:
+        messages.success(request, f"You must be logged in...")
+        return redirect("home")
 
 #-- Passenger Phones --#    
 def view_passenger_phones(request):
@@ -231,10 +310,27 @@ def view_passenger_phone(request, pk):
         return redirect('home')
     
 def delete_passenger_phone(request, pk):
-    pass
+    if request.user.is_authenticated:
+        delete_it = PassengerPhone.objects.get(PHONE=pk)
+        delete_it.delete()
+        messages.success(request, f"Phone number {pk} Deleted Successfully")
+        return redirect('home')
+    else:
+        messages.success(request, "You must be logged in to perform this action.")
+        return redirect('home')
 
 def add_passenger_phone(request):
-    pass
+    form = AddPassengerPhoneForm(request.POST or None)
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            if form.is_valid():
+                add_passenger_phone = form.save()
+                messages.success(request, f"Record Added...")
+                return redirect("home")
+        return render(request, 'add_passenger_phone.html', {"form": form})
+    else:
+        messages.success(request, f"You must be logged in...")
+        return redirect("home")
 
 #-- Passengers --#    
 def view_passengers(request):
@@ -254,10 +350,27 @@ def view_passenger(request, pk):
         return redirect('home')
     
 def delete_passenger(request, pk):
-    pass
+    if request.user.is_authenticated:
+        delete_it = Passenger.objects.get(PASSENGERNUM=pk)
+        delete_it.delete()
+        messages.success(request, f"Passenger with passenger number {pk} Deleted Successfully")
+        return redirect('home')
+    else:
+        messages.success(request, "You must be logged in to perform this action.")
+        return redirect('home')
 
 def add_passenger(request):
-    pass
+    form = AddPassengerForm(request.POST or None)
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            if form.is_valid():
+                add_passenger = form.save()
+                messages.success(request, f"Record Added...")
+                return redirect("home")
+        return render(request, 'add_passenger.html', {"form": form})
+    else:
+        messages.success(request, f"You must be logged in...")
+        return redirect("home")
 
 #-- Pilot Typeratings --#
 def view_pilot_typeratings(request):
@@ -273,11 +386,30 @@ def view_pilot_typerating(request, pilot_num, typerating):
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')
     
-def delete_pilot_typerating(request, pk):
-    pass
+def delete_pilot_typerating(request, pilot_num, typerating):
+    if request.user.is_authenticated:
+        delete_it = PilotTypeRating.objects.get(PILOTNUM=pilot_num, TYPERATING=typerating)
+        delete_it.delete()
+        # Add a success message
+        messages.success(request, f"Pilot type rating with pilot number {pilot_num} and type rating {typerating} deleted successfully.")
+        # Redirect to the desired page (e.g., home)
+        return redirect('home')
+    else:
+        messages.success(request, 'You must be logged in to perform this action.')
+        return redirect('home')
 
 def add_pilot_typerating(request):
-    pass
+    form = AddPilotTypeRatingForm(request.POST or None)
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            if form.is_valid():
+                add_pilot_typerating = form.save()
+                messages.success(request, f"Record Added...")
+                return redirect("home")
+        return render(request, 'add_pilot_typerating.html', {"form": form})
+    else:
+        messages.success(request, f"You must be logged in...")
+        return redirect("home")
 
 #-- Pilots --#    
 def view_pilots(request):
@@ -300,10 +432,27 @@ def view_pilot(request, pk):
         return redirect('home')
     
 def delete_pilot(request, pk):
-    pass
+    if request.user.is_authenticated:
+        delete_it = Pilot.objects.get(PILOTNUM=pk)
+        delete_it.delete()
+        messages.success(request, f"Pilot with pilot number {pk} Deleted Successfully")
+        return redirect('home')
+    else:
+        messages.success(request, "You must be logged in to perform this action.")
+        return redirect('home')
 
 def add_pilot(request):
-    pass
+    form = AddPilotForm(request.POST or None)
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            if form.is_valid():
+                add_pilot = form.save()
+                messages.success(request, f"Record Added...")
+                return redirect("home")
+        return render(request, 'add_pilot.html', {"form": form})
+    else:
+        messages.success(request, f"You must be logged in...")
+        return redirect("home")
 
 #-- Staff Addresses --#
 def view_staff_addresses(request):
@@ -336,7 +485,17 @@ def delete_staff_address(request, empnum, address):
         return redirect('home')
 
 def add_staff_address(request):
-    pass
+    form = AddStaffAddressForm(request.POST or None)
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            if form.is_valid():
+                add_staff_address = form.save()
+                messages.success(request, f"Record Added...")
+                return redirect("home")
+        return render(request, 'add_staff_address.html', {"form": form})
+    else:
+        messages.success(request, f"You must be logged in...")
+        return redirect("home")
 
 #-- Staff Phones --#    
 def view_staff_phones(request):
@@ -354,10 +513,27 @@ def view_staff_phone(request, pk):
         return redirect('home')
     
 def delete_staff_phone(request, pk):
-    pass
+    if request.user.is_authenticated:
+        delete_it = StaffPhone.objects.get(PHONE=pk)
+        delete_it.delete()
+        messages.success(request, f"Phone number {pk} Deleted Successfully")
+        return redirect('home')
+    else:
+        messages.success(request, "You must be logged in to perform this action.")
+        return redirect('home')
 
 def add_staff_phone(request):
-    pass
+    form = AddStaffPhoneForm(request.POST or None)
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            if form.is_valid():
+                add_staff_phone = form.save()
+                messages.success(request, f"Record Added...")
+                return redirect("home")
+        return render(request, 'add_staff_phone.html', {"form": form})
+    else:
+        messages.success(request, f"You must be logged in...")
+        return redirect("home")
     
 #-- Staff --#    
 def view_staff(request):
@@ -378,10 +554,27 @@ def view_staff_member(request, pk):
         return redirect('home')
     
 def delete_staff_member(request, pk):
-    pass
+    if request.user.is_authenticated:
+        delete_it = Staff.objects.get(EMPNUM=pk)
+        delete_it.delete()
+        messages.success(request, f"Staff member with employee number {pk} Deleted Successfully")
+        return redirect('home')
+    else:
+        messages.success(request, "You must be logged in to perform this action.")
+        return redirect('home')
 
 def add_staff_member(request):
-    pass
+    form = AddStaffForm(request.POST or None)
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            if form.is_valid():
+                add_staff_member = form.save()
+                messages.success(request, f"Record Added...")
+                return redirect("home")
+        return render(request, 'add_staff_member.html', {"form": form})
+    else:
+        messages.success(request, f"You must be logged in...")
+        return redirect("home")
 
 #-- Stretch --#    
 def view_stretches(request):
@@ -399,7 +592,24 @@ def view_stretch(request, pk):
         return redirect('home')
     
 def delete_stretch(request, pk):
-    pass
+    if request.user.is_authenticated:
+        delete_it = Stretch.objects.get(STRETCHNUM=pk)
+        delete_it.delete()
+        messages.success(request, f"Stretch with stretch number {pk} Deleted Successfully")
+        return redirect('home')
+    else:
+        messages.success(request, "You must be logged in to perform this action.")
+        return redirect('home')
 
 def add_stretch(request):
-    pass
+    form = AddStretchForm(request.POST or None)
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            if form.is_valid():
+                add_stretch = form.save()
+                messages.success(request, f"Record Added...")
+                return redirect("home")
+        return render(request, 'add_stretch.html', {"form": form})
+    else:
+        messages.success(request, f"You must be logged in...")
+        return redirect("home")

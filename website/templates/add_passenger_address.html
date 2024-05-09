@@ -2,10 +2,10 @@
 {% block content %}
 
 <div class="col-md-6 offset-md-3">
-<h1>Add Flight</h1>
+<h1>Add Passenger Address</h1>
 <br>
 
-<form method="POST" action="{% url 'add_flight' %}">
+<form method="POST" action="{% url 'add_passenger_address' %}">
     {% csrf_token %}
 
     {{ form.as_p }}
