@@ -83,7 +83,7 @@ urlpatterns = [
     path('staff/', views.view_staff, name='view_staff'),
     path('staff/<int:pk>', views.view_staff_member, name='view_staff_member'),
     path('delete_staff/<int:pk>', views.delete_staff_member, name='delete_staff_member'),
-    path('add_staff', views.add_staff_member, name='add_staff'),
+    path('add_staff_member', views.add_staff_member, name='add_staff_member'),
     
     #-- stretch --#
     path('stretches/', views.view_stretches, name='view_stretches'),

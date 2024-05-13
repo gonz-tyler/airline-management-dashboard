@@ -1,6 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django import forms
+from django.forms import inlineformset_factory
 from .models import *
 
 class SignUpForm(UserCreationForm):
@@ -32,129 +33,135 @@ class SignUpForm(UserCreationForm):
             
 
 class AddAirplaneForm(forms.ModelForm):
-    serial_number = forms.IntegerField(required=True, widget=forms.widgets.NumberInput(attrs={"placeholder":"Serial Number", "class":"form-control"}), label="")
-    manufacturer = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Last Name", "class":"form-control"}), label="")
-    model = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Last Name", "class":"form-control"}), label="")
+    SERIALNUM = forms.IntegerField(required=True, widget=forms.widgets.NumberInput(attrs={"placeholder":"Serial Number", "class":"form-control"}), label="")
+    MANUFACTURER = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Manufacturer", "class":"form-control"}), label="")
+    MODEL = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Model", "class":"form-control"}), label="")
 
     class Meta:
         model = Airplane
         exclude = ("user",)
 
 class AddCityForm(forms.ModelForm):
-    city_code = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Last Name", "class":"form-control"}), label="")
-    city_name = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Last Name", "class":"form-control"}), label="")
+    CITYCODE = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Airport Code", "class":"form-control"}), label="")
+    CITYNAME = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"City Name", "class":"form-control"}), label="")
 
     class Meta:
         model = City
         exclude = ("user",)
 
 class AddStaffForm(forms.ModelForm):
-    employee_number = forms.IntegerField(required=True, widget=forms.widgets.NumberInput(attrs={"placeholder":"Serial Number", "class":"form-control"}), label="")
-    surname = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Last Name", "class":"form-control"}), label="")
-    name = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Last Name", "class":"form-control"}), label="")
-    salary = forms.DecimalField(required=True, widget=forms.widgets.NumberInput(attrs={"placeholder":"Serial Number", "class":"form-control"}), label="")
-    type = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Last Name", "class":"form-control"}), label="")
+    EMPNUM = forms.IntegerField(required=True, widget=forms.widgets.NumberInput(attrs={"placeholder":"Employee Number", "class":"form-control"}), label="")
+    SURNAME = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Last Name", "class":"form-control"}), label="")
+    NAME = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"First Name", "class":"form-control"}), label="")
+    SALARY = forms.DecimalField(required=True, widget=forms.widgets.NumberInput(attrs={"placeholder":"Salary", "class":"form-control"}), label="")
+    type_choices = (('Pilot', 'Pilot'),('Crew', 'Crew'),)
+    TYPE = forms.ChoiceField(required=True,choices=type_choices,widget=forms.Select(attrs={"class": "form-control"}),label="")
 
     class Meta:
         model = Staff
         exclude = ("user",)
 
 class AddPilotForm(forms.ModelForm):
-    pilot_number = forms.IntegerField(required=True, widget=forms.widgets.NumberInput(attrs={"placeholder":"Serial Number", "class":"form-control"}), label="")
+    PILOTNUM = forms.IntegerField(required=True, widget=forms.widgets.NumberInput(attrs={"placeholder":"Pilot Number", "class":"form-control"}), label="")
     pilot_choices = Staff.objects.filter(TYPE='Pilot')
-    employee_number = forms.ModelChoiceField(queryset=pilot_choices, widget=forms.Select(attrs={"class": "form-control"}), label="")
+    EMPNUM = forms.ModelChoiceField(queryset=pilot_choices, widget=forms.Select(attrs={"class": "form-control"}), label="")
 
     class Meta:
         model = Pilot
         exclude = ("user",)
 
 class AddFlightForm(forms.ModelForm):
-    flight_number = forms.IntegerField(required=True, widget=forms.widgets.NumberInput(attrs={"placeholder":"Flight Number", "class":"form-control"}), label="")
-    origin_city_code = forms.ModelChoiceField(queryset=City.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
-    destination_city_code = forms.ModelChoiceField(queryset=City.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
-    departure_time = forms.DateTimeField(widget=forms.DateTimeInput(attrs={"class": "form-control", "placeholder": "YYYY-MM-DD HH:MM:SS"}), label="")
-    arrival_time = forms.DateTimeField(widget=forms.DateTimeInput(attrs={"class": "form-control", "placeholder": "YYYY-MM-DD HH:MM:SS"}), label="")
-    pilot_number = forms.ModelChoiceField(queryset=Pilot.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
-    plane_number = forms.ModelChoiceField(queryset=Airplane.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
+    FLIGHTNUM = forms.IntegerField(required=True, widget=forms.widgets.NumberInput(attrs={"placeholder":"Flight Number", "class":"form-control"}), label="")
+    ORIGINCITYCODE = forms.ModelChoiceField(queryset=City.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
+    DESTCITYCODE = forms.ModelChoiceField(queryset=City.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
+    DEPTIME = forms.DateTimeField(widget=forms.DateTimeInput(attrs={"class": "form-control", "placeholder": "YYYY-MM-DD HH:MM:SS"}), label="")
+    ARRTIME = forms.DateTimeField(widget=forms.DateTimeInput(attrs={"class": "form-control", "placeholder": "YYYY-MM-DD HH:MM:SS"}), label="")
+    PILOTNUM = forms.ModelChoiceField(queryset=Pilot.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
+    PLANENUM = forms.ModelChoiceField(queryset=Airplane.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
 
     class Meta:
         model = Flight
         exclude = ("user",)
 
 class AddFlightCrewForm(forms.ModelForm):
-    flight_number = forms.ModelChoiceField(queryset=Flight.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
+    FLIGHTNUM = forms.ModelChoiceField(queryset=Flight.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
     crew_choices = Staff.objects.filter(TYPE='Crew')
-    employee_number = forms.ModelChoiceField(queryset=crew_choices, widget=forms.Select(attrs={"class": "form-control"}), label="")
+    EMPNUM = forms.ModelChoiceField(queryset=crew_choices, widget=forms.Select(attrs={"class": "form-control"}), label="")
 
     class Meta:
         model = FlightCrew
         exclude = ("user",)
 
 class AddPassengerForm(forms.ModelForm):
-    passenger_number = forms.IntegerField(required=True, widget=forms.widgets.NumberInput(attrs={"placeholder":"Serial Number", "class":"form-control"}), label="")
-    surname = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Last Name", "class":"form-control"}), label="")
-    name = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Last Name", "class":"form-control"}), label="")
+    PASSENGERNUM = forms.IntegerField(required=True, widget=forms.widgets.NumberInput(attrs={"placeholder":"Passenger Number", "class":"form-control"}), label="")
+    SURNAME = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Last Name", "class":"form-control"}), label="")
+    NAME = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"First Name", "class":"form-control"}), label="")
 
     class Meta:
         model = Passenger
         exclude = ("user",)
 
 class AddPassengerAddressForm(forms.ModelForm):
-    address_details = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Last Name", "class":"form-control"}), label="")
-    passenger_number = forms.ModelChoiceField(queryset=Passenger.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
+    ADDRESSDETAILS = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Address", "class":"form-control"}), label="")
+    #PASSENGERNUM = forms.ModelChoiceField(queryset=Passenger.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
 
     class Meta:
         model = PassengerAddress
-        exclude = ("user",)
+        exclude = ("user","PASSENGERNUM")
+
+
+class AddPassengerPhoneForm(forms.ModelForm):
+    PHONE = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Phone Number", "class":"form-control"}), label="")
+    #PASSENGERNUM = forms.ModelChoiceField(queryset=Passenger.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
+
+    class Meta:
+        model = PassengerPhone
+        exclude = ("user","PASSENGERNUM")
+
+# Create formsets using the inlineformset_factory
+PassengerAddressFormSet = inlineformset_factory(Passenger, PassengerAddress, form=AddPassengerAddressForm, extra=1)
+PassengerPhoneFormSet = inlineformset_factory(Passenger, PassengerPhone, form=AddPassengerPhoneForm, extra=1)
 
 class AddPassengerBookingForm(forms.ModelForm):
-    passenger_number = forms.ModelChoiceField(queryset=Passenger.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
-    flight_number = forms.ModelChoiceField(queryset=Flight.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
+    PASSENGERNUM = forms.ModelChoiceField(queryset=Passenger.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
+    FLIGHTNUM = forms.ModelChoiceField(queryset=Flight.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
 
     class Meta:
         model = PassengerBooking
         exclude = ("user",)
 
-class AddPassengerPhoneForm(forms.ModelForm):
-    phone = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Last Name", "class":"form-control"}), label="")
-    passenger_number = forms.ModelChoiceField(queryset=Passenger.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
-
-    class Meta:
-        model = PassengerPhone
-        exclude = ("user",)
-
 class AddPilotTypeRatingForm(forms.ModelForm):
-    type_rating = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Last Name", "class":"form-control"}), label="")
-    pilot_number = forms.ModelChoiceField(queryset=Pilot.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
-    date_earned = forms.DateTimeField(widget=forms.DateTimeInput(attrs={"class": "form-control", "placeholder": "YYYY-MM-DD HH:MM:SS"}), label="")
+    TYPERATING = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Type Rating", "class":"form-control"}), label="")
+    PILOTNUM = forms.ModelChoiceField(queryset=Pilot.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
+    DATEEARNED = forms.DateTimeField(widget=forms.DateTimeInput(attrs={"class": "form-control", "placeholder": "YYYY-MM-DD HH:MM:SS"}), label="")
 
     class Meta:
         model = PilotTypeRating
         exclude = ("user",)
 
 class AddStaffAddressForm(forms.ModelForm):
-    address_details = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Last Name", "class":"form-control"}), label="")
-    employee_number = forms.ModelChoiceField(queryset=Staff.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
+    ADDRESSDETAILS = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Address", "class":"form-control"}), label="")
+    EMPNUM = forms.ModelChoiceField(queryset=Staff.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
 
     class Meta:
         model = StaffAddress
         exclude = ("user",)
 
 class AddStaffPhoneForm(forms.ModelForm):
-    phone = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Last Name", "class":"form-control"}), label="")
-    employee_number = forms.ModelChoiceField(queryset=Staff.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
+    PHONE = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Phone Number", "class":"form-control"}), label="")
+    EMPNUM = forms.ModelChoiceField(queryset=Staff.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
 
     class Meta:
         model = StaffPhone
         exclude = ("user",)
 
 class AddStretchForm(forms.ModelForm):
-    stretch_number = forms.IntegerField(required=True, widget=forms.widgets.NumberInput(attrs={"placeholder":"Serial Number", "class":"form-control"}), label="")
-    origin_city_code = forms.ModelChoiceField(queryset=City.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
-    destination_city_code = forms.ModelChoiceField(queryset=City.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
-    flight_number = forms.ModelChoiceField(queryset=Flight.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
-    arrival_time = forms.DateTimeField(widget=forms.DateTimeInput(attrs={"class": "form-control", "placeholder": "YYYY-MM-DD HH:MM:SS"}), label="")
-    departure_time = forms.DateTimeField(widget=forms.DateTimeInput(attrs={"class": "form-control", "placeholder": "YYYY-MM-DD HH:MM:SS"}), label="")
+    STRETCHNUM = forms.IntegerField(required=True, widget=forms.widgets.NumberInput(attrs={"placeholder":"Serial Number", "class":"form-control"}), label="")
+    ORIGINCITYCODE = forms.ModelChoiceField(queryset=City.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
+    DESTCITYCODE = forms.ModelChoiceField(queryset=City.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
+    FLIGHTNUM = forms.ModelChoiceField(queryset=Flight.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
+    ARRTIME = forms.DateTimeField(widget=forms.DateTimeInput(attrs={"class": "form-control", "placeholder": "YYYY-MM-DD HH:MM:SS"}), label="")
+    DEPTIME = forms.DateTimeField(widget=forms.DateTimeInput(attrs={"class": "form-control", "placeholder": "YYYY-MM-DD HH:MM:SS"}), label="")
 
     class Meta:
         model = Stretch

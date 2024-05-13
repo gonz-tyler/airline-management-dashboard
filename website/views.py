@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import *
 from .models import *
+import json
 
 #-- Render Home Page --#
 def home(request):
@@ -359,7 +360,7 @@ def delete_passenger(request, pk):
         messages.success(request, "You must be logged in to perform this action.")
         return redirect('home')
 
-def add_passenger(request):
+"""def add_passenger(request):
     form = AddPassengerForm(request.POST or None)
     if request.user.is_authenticated:
         if request.method == "POST":
@@ -370,7 +371,99 @@ def add_passenger(request):
         return render(request, 'add_passenger.html', {"form": form})
     else:
         messages.success(request, f"You must be logged in...")
+        return redirect("home")"""
+    
+from django.forms import formset_factory
+
+"""def add_passenger(request):
+    form = AddPassengerForm(request.POST or None)
+    AddressFormSet = formset_factory(AddPassengerAddressForm)
+    PhoneFormSet = formset_factory(AddPassengerPhoneForm)
+    address_forms = AddressFormSet(request.POST or None, prefix='addresses')
+    phone_forms = PhoneFormSet(request.POST or None, prefix='phones')
+
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            if form.is_valid() and address_forms.is_valid() and phone_forms.is_valid():
+                passenger = form.save(commit=False)
+                passenger.user = request.user
+                passenger.save()
+
+                for address_form in address_forms:
+                    address_form.instance.PASSENGERNUM = passenger
+                    if form.cleaned_data.get('address'):
+                        address = form.save(commit=False)
+                        address.passenger_id = request.POST.get('passenger_number')  # Assuming you're passing passenger number through the form
+                        address.save()
+                    #if address_form.cleaned_data:
+                     #   address_details = address_form.cleaned_data.get('ADDRESSDETAILS')
+                      #  if address_details:
+                       #     PassengerAddress.objects.create(PASSENGERNUM=passenger, ADDRESSDETAILS=address_details)
+
+                for phone_form in phone_forms:
+                    if phone_form.cleaned_data:
+                        phone_number = phone_form.cleaned_data.get('PHONE')
+                        if phone_number:
+                            PassengerPhone.objects.create(PASSENGERNUM=passenger, PHONE=phone_number)
+
+                messages.success(request, "Passenger record added successfully.")
+                return redirect("home")
+
+    else:
+        messages.error(request, "You must be logged in to add a passenger.")
         return redirect("home")
+
+    return render(request, 'add_passenger.html', {"form": form, "address_formset": address_forms, "phone_formset": phone_forms})
+"""
+
+def add_passenger(request):
+    if request.user.is_authenticated:
+        print("user authenticated")
+        form = AddPassengerForm(request.POST or None)
+        AddressFormSet = formset_factory(AddPassengerAddressForm)
+        PhoneFormSet = formset_factory(AddPassengerPhoneForm)
+        address_forms = AddressFormSet(request.POST or None, prefix='addresses')
+        phone_forms = PhoneFormSet(request.POST or None, prefix='phones')
+        if request.method == "POST":
+            #data = json.loads(request.body)
+            print(request.body)
+        
+            # Extract passenger details
+            #name = data.get('name')
+            #surname = data.get('surname')
+
+            # Extract addresses and phones
+            #addresses = data.get('addresses', [])
+            #phones = data.get('phones', [])
+            # Extracting data from POST request
+            passenger_num = request.POST.get('PASSENGERNUM')
+            name = request.POST.get('NAME')
+            surname = request.POST.get('SURNAME')
+
+            # Extracting addresses
+            addresses = request.POST.getlist('addresses-0-ADDRESSDETAILS')
+
+            # Extracting phones
+            phones = request.POST.getlist('phones-0-PHONE')
+
+            # Creating and saving Passenger object
+            passenger = Passenger.objects.create(PASSENGERNUM=passenger_num, NAME=name, SURNAME=surname)
+
+            # Creating and saving PassengerAddress objects
+            for address in addresses:
+                PassengerAddress.objects.create(PASSENGERNUM=passenger, ADDRESSDETAILS=address)
+
+            # Creating and saving PassengerPhone objects
+            for phone in phones:
+                PassengerPhone.objects.create(PASSENGERNUM=passenger, PHONE=phone)
+
+            messages.success(request, "Passenger record added successfully.")
+            return redirect("home")
+
+    else:
+        messages.error(request, "You must be logged in to add a passenger.")
+        return redirect("home")
+    return render(request, 'add_passenger.html', {"form": form, "address_formset": address_forms, "phone_formset": phone_forms})
 
 #-- Pilot Typeratings --#
 def view_pilot_typeratings(request):
