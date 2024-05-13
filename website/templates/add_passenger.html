@@ -50,6 +50,7 @@
 <script>
     $(document).ready(function () {
         var addresses = []; // Array to store addresses
+        var phones = []; // Array to store phones
 
         // Add address
         $("#add-address").click(function () {
@@ -91,6 +92,50 @@
                     var address = $(this).val();
                     if (address.trim() !== "") {
                         addresses.push(address);
+                    }
+                });
+        }
+
+        // Add phone
+        $("#add-address").click(function () {
+            var container = $("#phones-container");
+            var totalForms = container.find("input[name$='-PHONE']").length;
+            var newForm = container.find("div.phone-form:first").clone(true);
+            newForm.find("input").val("");
+            newForm.find("label").attr("for", function () {
+                return $(this)
+                    .attr("for")
+                    .replace("-" + (totalForms - 1) + "-", "-" + totalForms + "-");
+            });
+            newForm.find("input").attr("id", function () {
+                return $(this)
+                    .attr("id")
+                    .replace("-" + (totalForms - 1) + "-", "-" + totalForms + "-");
+            });
+            container.append(newForm);
+            toggleRemoveButtons();
+        });
+
+        // Remove phone
+        $(document).on("click", ".remove-phone", function () {
+            var totalForms = $("#phones-container").find(
+                "input[name$='-PHONE']"
+            ).length;
+            if (totalForms > 1) {
+                $(this).parent().remove();
+            }
+            toggleRemoveButtons();
+        });
+
+        // Collect phones
+        function collectPhones() {
+            phones = [];
+            $("#phones-container")
+                .find("input[name$='-PHONE']")
+                .each(function () {
+                    var phone = $(this).val();
+                    if (phone.trim() !== "") {
+                        phones.push(phone);
                     }
                 });
         }
