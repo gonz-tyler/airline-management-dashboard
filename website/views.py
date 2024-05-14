@@ -128,6 +128,19 @@ def add_city(request):
     else:
         messages.success(request, f"You must be logged in...")
         return redirect("home")
+    
+def update_city(request, pk):
+	if request.user.is_authenticated:
+		current_record = City.objects.get(CITYCODE=pk)
+		form = AddCityForm(request.POST or None, instance=current_record)
+		if form.is_valid():
+			form.save()
+			messages.success(request, "Record Has Been Updated!")
+			return redirect('view_cities')
+		return render(request, 'update_city.html', {'form':form})
+	else:
+		messages.success(request, "You Must Be Logged In...")
+		return redirect('home')
 
 #-- Flight Crews --#    
 def view_crews(request):
@@ -418,7 +431,6 @@ from django.forms import formset_factory
 
 def add_passenger(request):
     if request.user.is_authenticated:
-        print("user authenticated")
         form = AddPassengerForm(request.POST or None)
         AddressFormSet = formset_factory(AddPassengerAddressForm)
         PhoneFormSet = formset_factory(AddPassengerPhoneForm)
@@ -427,14 +439,7 @@ def add_passenger(request):
         if request.method == "POST":
             #data = json.loads(request.body)
             print(request.body)
-        
-            # Extract passenger details
-            #name = data.get('name')
-            #surname = data.get('surname')
 
-            # Extract addresses and phones
-            #addresses = data.get('addresses', [])
-            #phones = data.get('phones', [])
             # Extracting data from POST request
             passenger_num = request.POST.get('PASSENGERNUM')
             name = request.POST.get('NAME')
@@ -570,8 +575,14 @@ def delete_staff_address(request, empnum, address):
         delete_it.delete()
         # Add a success message
         messages.success(request, f"Staff address with employee number {empnum} and address details {address} deleted successfully.")
-        # Redirect to the desired page (e.g., home)
-        return redirect('home')
+        # Get the referrer URL
+        referer = request.META.get('HTTP_REFERER', None)
+        
+        # Redirect to the referrer or a default page
+        if referer:
+            return redirect(referer)
+        else:
+            return redirect('view_staff')  # Default redirection if referer is not found
     else:
         # Add a message for unauthenticated users
         messages.error(request, "You must be logged in to perform this action.")
@@ -610,7 +621,15 @@ def delete_staff_phone(request, pk):
         delete_it = StaffPhone.objects.get(PHONE=pk)
         delete_it.delete()
         messages.success(request, f"Phone number {pk} Deleted Successfully")
-        return redirect('home')
+        #return redirect('staff')
+        # Get the referrer URL
+        referer = request.META.get('HTTP_REFERER', None)
+        
+        # Redirect to the referrer or a default page
+        if referer:
+            return redirect(referer)
+        else:
+            return redirect('view_staff')  # Default redirection if referer is not found
     else:
         messages.success(request, "You must be logged in to perform this action.")
         return redirect('home')
@@ -640,8 +659,15 @@ def view_staff_member(request, pk):
         staff_member = Staff.objects.get(EMPNUM=pk)
         addresses = StaffAddress.objects.filter(EMPNUM=pk)
         phones = StaffPhone.objects.filter(EMPNUM=pk)
-        flights = Flight.objects.filter(flightcrew__EMPNUM=pk)
-        return render(request, 'staff_details.html', {'staff_member': staff_member, 'addresses': addresses, 'phones': phones, 'flights': flights})
+        if staff_member.TYPE == 'Crew':
+            flights = Flight.objects.filter(flightcrew__EMPNUM=pk)
+            return render(request, 'staff_details.html', {'staff_member': staff_member, 'addresses': addresses, 'phones': phones, 'flights': flights})
+        else:
+            pilot = Pilot.objects.get(EMPNUM=pk)
+            # Use the pilotnum to filter the Flight objects
+            flights = Flight.objects.filter(PILOTNUM=pilot.PILOTNUM)
+            typeratings = PilotTypeRating.objects.filter(PILOTNUM=pilot)
+            return render(request, 'staff_details.html', {'staff_member': staff_member, 'addresses': addresses, 'phones': phones, 'flights': flights, 'typeratings': typeratings})
     else:
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')
@@ -656,7 +682,97 @@ def delete_staff_member(request, pk):
         messages.success(request, "You must be logged in to perform this action.")
         return redirect('home')
 
+"""def add_staff_member(request):
+    if request.user.is_authenticated:
+        form = AddStaffForm(request.POST or None)
+        AddressFormSet = formset_factory(AddStaffAddressForm)
+        PhoneFormSet = formset_factory(AddStaffPhoneForm)
+        address_forms = AddressFormSet(request.POST or None, prefix='addresses')
+        phone_forms = PhoneFormSet(request.POST or None, prefix='phones')
+        if request.method == "POST":
+            #data = json.loads(request.body)
+            print(request.body)
+
+            # Extracting data from POST request
+            employee_num = request.POST.get('EMPNUM')
+            name = request.POST.get('NAME')
+            surname = request.POST.get('SURNAME')
+            type = request.POST.get('TYPE')
+            salary = request.POST.get('SALARY')
+
+            # Extracting addresses
+            addresses = request.POST.getlist('addresses-0-ADDRESSDETAILS')
+
+            # Extracting phones
+            phones = request.POST.getlist('phones-0-PHONE')
+
+            # Creating and saving Passenger object
+            staff_member = Staff.objects.create(EMPNUM=employee_num, NAME=name, SURNAME=surname, TYPE=type, SALARY=salary)
+
+            # Creating and saving PassengerAddress objects
+            for address in addresses:
+                StaffAddress.objects.create(EMPNUM=staff_member, ADDRESSDETAILS=address)
+
+            # Creating and saving PassengerPhone objects
+            for phone in phones:
+                StaffPhone.objects.create(EMPNUM=staff_member, PHONE=phone)
+
+            messages.success(request, "Passenger record added successfully.")
+            return redirect("view_staff")"""
+        
+
 def add_staff_member(request):
+    if request.user.is_authenticated:
+        form = AddStaffForm(request.POST or None)
+        AddressFormSet = formset_factory(AddStaffAddressForm)
+        PhoneFormSet = formset_factory(AddStaffPhoneForm)
+        address_forms = AddressFormSet(request.POST or None, prefix='addresses')
+        phone_forms = PhoneFormSet(request.POST or None, prefix='phones')
+        
+        if request.method == "POST":
+            if form.is_valid() and address_forms.is_valid() and phone_forms.is_valid():
+                # Extracting data from POST request
+                employee_num = form.cleaned_data['EMPNUM']
+                name = form.cleaned_data['NAME']
+                surname = form.cleaned_data['SURNAME']
+                type = form.cleaned_data['TYPE']
+                pilot_num = form.cleaned_data['pilotnum']
+                salary = form.cleaned_data['SALARY']
+                
+                # Extracting addresses
+                addresses = request.POST.getlist('addresses-0-ADDRESSDETAILS')
+                
+                # Extracting phones
+                phones = request.POST.getlist('phones-0-PHONE')
+                
+                # Check for duplicate phone numbers
+                existing_phones = StaffPhone.objects.filter(PHONE__in=phones).values_list('PHONE', flat=True)
+                if existing_phones:
+                    messages.error(request, {'PHONE': 'Phone number(s) {} already exist.'.format(', '.join(existing_phones))})
+                else:
+                    # Creating and saving Staff object
+                    staff_member = Staff.objects.create(EMPNUM=employee_num, NAME=name, SURNAME=surname, TYPE=type, SALARY=salary)
+                    if type == 'Pilot':
+                        Pilot.objects.create(EMPNUM=staff_member, PILOTNUM=pilot_num)
+
+                    # Creating and saving StaffAddress objects
+                    for address in addresses:
+                        StaffAddress.objects.create(EMPNUM=staff_member, ADDRESSDETAILS=address)
+
+                    # Creating and saving StaffPhone objects
+                    for phone in phones:
+                        StaffPhone.objects.create(EMPNUM=staff_member, PHONE=phone)
+
+                    messages.success(request, "Staff record added successfully.")
+                    return redirect("view_staff")
+            else:
+                messages.error(request, "Please correct the errors below.")
+
+    else:
+        messages.error(request, "You must be logged in to add a passenger.")
+        return redirect("home")
+    return render(request, 'add_staff_member.html', {"form": form, "address_formset": address_forms, "phone_formset": phone_forms})
+
     form = AddStaffForm(request.POST or None)
     if request.user.is_authenticated:
         if request.method == "POST":

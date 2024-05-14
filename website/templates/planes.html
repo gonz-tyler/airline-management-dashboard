@@ -5,7 +5,14 @@
 
 {% if user.is_authenticated %}
 
-<h1>Planes</h1>
+<div class="header-container">
+    <h1>Planes</h1>
+    {% if user.is_superuser %}
+    <a href="{% url 'add_plane' %}" class="btn btn-primary add-record-btn">
+        <i class="fas fa-plus"></i> Add Plane
+    </a>
+    {% endif %}
+</div>
 
 <table class="table table-striped table-hover table-bordered border-secondary">
     <thead class="table-primary">

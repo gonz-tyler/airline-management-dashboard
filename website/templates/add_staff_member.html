@@ -2,18 +2,152 @@
 {% block content %}
 
 <div class="col-md-6 offset-md-3">
-<h1>Add Staff Member</h1>
-<br>
-
-<form method="POST" action="{% url 'add_staff_member' %}">
-    {% csrf_token %}
-
-    {{ form.as_p }}
+    <h1>Add Staff Member</h1>
     <br>
-    <button type="submit" class="btn btn-primary">Add</button>
-
-
-</form>
-
+    <form method="POST" action="{% url 'add_staff_member' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <!--<div id="pilotnum-container" style="display: none;">
+            {{ form.pilotnum }}
+        </div>-->
+        <div id="addresses-container">
+            {{ address_formset.management_form }}
+            {% for form in address_formset %}
+            <div class="address-form">
+                <div class="input-button-container">
+                    {{ form.as_p }}
+                    <button type="button" class="btn btn-danger remove-address">
+                        Remove Address
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <button type="button" class="btn btn-primary" id="add-address">
+            Add Address
+        </button>
+        <div id="phones-container">
+            <br />
+            {{ phone_formset.management_form }}
+            {% for form in phone_formset %}
+            <div class="phone-form">
+                <div class="input-button-container">
+                    {{ form.as_p }}
+                    <button type="button" class="btn btn-danger remove-phone">
+                        Remove Phone
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <br>
+        <button type="button" class="btn btn-primary" id="add-phone">
+            Add Phone
+        </button>
+        <br />
+        <br />
+        <a href="{% url 'view_staff' %}" class="btn btn-secondary">Back</a>
+        <button type="submit" class="btn btn-success">Save Staff Member</button>
+        <br />
+    </form>
 </div>
-{%endblock%}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        function togglePilotNumField() {
+            var staffType = $('#id_TYPE').val();
+            if (staffType === 'Pilot') {
+                $('#id_pilotnum').show();
+            } else {
+                $('#id_pilotnum').hide();
+            }
+        }
+
+        $('#id_TYPE').change(togglePilotNumField);
+        togglePilotNumField(); // Initial check
+
+        // Add address
+        $("#add-address").click(function () {
+            var container = $("#addresses-container");
+            var totalForms = container.find("input[name$='-ADDRESSDETAILS']").length;
+            var newForm = container.find("div.address-form:first").clone(true);
+            newForm.find("input").val("");
+            newForm.find("label").attr("for", function () {
+                return $(this)
+                    .attr("for")
+                    .replace("-" + (totalForms - 1) + "-", "-" + totalForms + "-");
+            });
+            newForm.find("input").attr("id", function () {
+                return $(this)
+                    .attr("id")
+                    .replace("-" + (totalForms - 1) + "-", "-" + totalForms + "-");
+            });
+            container.append(newForm);
+            toggleRemoveButtons();
+        });
+
+        // Remove address
+        $(document).on("click", ".remove-address", function () {
+            var totalForms = $("#addresses-container").find(
+                "input[name$='-ADDRESSDETAILS']"
+            ).length;
+            if (totalForms > 1) {
+                $(this).closest(".address-form").remove();
+            }
+            toggleRemoveButtons();
+        });
+
+        // Add phone
+        $("#add-phone").click(function () {
+            var container = $("#phones-container");
+            var totalForms = container.find("input[name$='-PHONE']").length;
+            var newForm = container.find("div.phone-form:first").clone(true);
+            newForm.find("input").val("");
+            newForm.find("label").attr("for", function () {
+                return $(this)
+                    .attr("for")
+                    .replace("-" + (totalForms - 1) + "-", "-" + totalForms + "-");
+            });
+            newForm.find("input").attr("id", function () {
+                return $(this)
+                    .attr("id")
+                    .replace("-" + (totalForms - 1) + "-", "-" + totalForms + "-");
+            });
+            container.append(newForm);
+            toggleRemoveButtons();
+        });
+
+        // Remove phone
+        $(document).on("click", ".remove-phone", function () {
+            var totalForms = $("#phones-container").find(
+                "input[name$='-PHONE']"
+            ).length;
+            if (totalForms > 1) {
+                $(this).closest(".phone-form").remove();
+            }
+            toggleRemoveButtons();
+        });
+
+        // Toggle remove buttons
+        function toggleRemoveButtons() {
+            var addressForms = $("#addresses-container").find(".address-form");
+            var phoneForms = $("#phones-container").find(".phone-form");
+            if (addressForms.length === 1) {
+                addressForms.find(".remove-address").hide();
+            } else {
+                addressForms.find(".remove-address").show();
+            }
+            if (phoneForms.length === 1) {
+                phoneForms.find(".remove-phone").hide();
+            } else {
+                phoneForms.find(".remove-phone").show();
+            }
+        }
+
+        // Initial toggle
+        toggleRemoveButtons();
+    });
+</script>
+
+{% endblock %}

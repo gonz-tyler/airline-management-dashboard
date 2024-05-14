@@ -7,56 +7,80 @@
         <p class="list-group-item"><strong>Name: </strong>{{ staff_member.NAME }}</p>
         <p class="list-group-item"><strong>Surname: </strong>{{ staff_member.SURNAME }}</p>
         <p class="list-group-item"><strong>Salary: </strong>{{ staff_member.SALARY }}</p>
+        <p class="list-group-item"><strong>Type: </strong>{{ staff_member.TYPE }}</p>
 
         <h5>Addresses:</h5>
         <ul>
             {% for address in addresses %}
-                <li>{{ address.ADDRESSDETAILS }}</li>
+            <li>{{ address.ADDRESSDETAILS }}</li>
+            <a href="{% url 'delete_staff_address' address.EMPNUM.EMPNUM address.ADDRESSDETAILS|urlencode %}"
+                class="btn btn-danger">Delete</a>
             {% endfor %}
         </ul>
 
         <h5>Phones:</h5>
         <ul>
             {% for phone in phones %}
-                <li>{{ phone.PHONE }}</li>
+            <li>{{ phone.PHONE }}</li>
+            {% if user.is_superuser %}
+            <a href="{% url 'delete_staff_phone' phone.PHONE %}" class="btn btn-danger">Delete</a>
+            {% endif %}
             {% endfor %}
         </ul>
+        {% if typeratings %}
+        <h5>Type Ratings:</h5>
+        <table class="table table-hover table-sm">
+            <thead class="">
+                <tr>
+                    <th scope="col">Aircraft</th>
+                    <th scope="col">Date Earned</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for typerating in typeratings %}
+                <tr>
+                    <td>{{ typerating.TYPERATING }}</td>
+                    <td>{{ typerating.DATEEARNED }}</td>
+                </tr>
+                {%endfor%}
+            </tbody>
+        </table>
+        {% endif %}
 
-        <h5>Associated Flights:</h5>
-        <ul>
-            {% for flight in flights %}
-                <li>Flight Number: {{ flight.FLIGHTNUM }}</li>
-                <!-- Display other flight details as needed -->
-            {% endfor %}
-        </ul>
         {% if flights %}
-            <h5>Associated Flights:</h5>
-            <table class="table table-striped table-hover table-bordered border-secondary">
-                <thead class="table-primary">
-                    <tr>
-                        <th scope="col">Flight Number</th>
-                        <th scope="col">Origin</th>
-                        <th scope="col">Destination</th>
-                        <th scope="col">Departure Time</th>
-                        <th scope="col">Arrival Time</th>
-                        <th scope="col">Pilot</th>
-                        <th scope="col">Plane ID</th>
-                    </tr>
-                </thead>
-                <tbody>
-                        {% for flight in flights %}
-                            <tr>
-                                <td><a href="{% url 'view_flight' flight.FLIGHTNUM %}">{{ flight.FLIGHTNUM }}</a></td>
-                                <td><a href="{% url 'view_city' flight.ORIGINCITYCODE.CITYCODE %}">{{ flight.ORIGINCITYCODE.CITYCODE }}</a></td>
-                                <td><a href="{% url 'view_city' flight.DESTCITYCODE.CITYCODE %}">{{ flight.DESTCITYCODE.CITYCODE }}</a></td>
-                                <td>{{ flight.DEPTIME }}</td>
-                                <td>{{ flight.ARRTIME }}</td>
-                                <td><a href="{% url 'view_pilot' flight.PILOTNUM.PILOTNUM %}">{{ flight.PILOTNUM.PILOTNUM }}</a></td>
-                                <td><a href="{% url 'view_plane' flight.PLANENUM.SERIALNUM %}">{{ flight.PLANENUM.SERIALNUM }}</a></td>
-                            </tr>
-                        {%endfor%}
-                </tbody>
-            </table>
+        <h5>Associated Flights:</h5>
+        <table class="table table-striped table-hover table-bordered border-secondary">
+            <thead class="table-primary">
+                <tr>
+                    <th scope="col">Flight Number</th>
+                    <th scope="col">Origin</th>
+                    <th scope="col">Destination</th>
+                    <th scope="col">Departure Time</th>
+                    <th scope="col">Arrival Time</th>
+                    <th scope="col">Pilot</th>
+                    <th scope="col">Plane ID</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for flight in flights %}
+                <tr>
+                    <td><a href="{% url 'view_flight' flight.FLIGHTNUM %}">{{ flight.FLIGHTNUM }}</a></td>
+                    <td><a
+                            href="{% url 'view_city' flight.ORIGINCITYCODE.CITYCODE %}">{{flight.ORIGINCITYCODE.CITYCODE}}</a>
+                    </td>
+                    <td><a
+                            href="{% url 'view_city' flight.DESTCITYCODE.CITYCODE %}">{{flight.DESTCITYCODE.CITYCODE}}</a>
+                    </td>
+                    <td>{{ flight.DEPTIME }}</td>
+                    <td>{{ flight.ARRTIME }}</td>
+                    <td><a href="{% url 'view_pilot' flight.PILOTNUM.PILOTNUM %}">{{ flight.PILOTNUM.PILOTNUM }}</a>
+                    </td>
+                    <td><a href="{% url 'view_plane' flight.PLANENUM.SERIALNUM %}">{{ flight.PLANENUM.SERIALNUM }}</a>
+                    </td>
+                </tr>
+                {%endfor%}
+            </tbody>
+        </table>
         {% endif %}
         <a onclick="history.back()" class="btn btn-secondary">Back</a>
         {% if user.is_superuser %}

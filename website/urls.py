@@ -34,7 +34,7 @@ urlpatterns = [
     #-- passenger address --#
     path('passenger_addresses/', views.view_passenger_addresses, name='view_passenger_addresses'),
     path('passenger_addresses/<int:pk>', views.view_passenger_address, name='view_passenger_address'),
-    path('delete_passenger_address/<int:pk1>/<str:pk2>', views.delete_passenger_address, name='delete_passenger_address'),
+    path('delete_passenger_address/<int:passengernum>/<str:address>', views.delete_passenger_address, name='delete_passenger_address'),
     path('add_passenger_address', views.add_passenger_address, name='add_passenger_address'),
 
     #-- passenger booking --#
@@ -46,7 +46,7 @@ urlpatterns = [
     #-- passenger phone --#
     path('passenger_phones/', views.view_passenger_phones, name='view_passenger_phones'),
     path('passenger_phones/<int:pk>', views.view_passenger_phone, name='view_passenger_phone'),
-    path('delete_passenger_phone/<int:pk>', views.delete_passenger_phone, name='delete_passenger_phone'),
+    path('delete_passenger_phone/<str:pk>', views.delete_passenger_phone, name='delete_passenger_phone'),
     path('add_passenger_phone', views.add_passenger_phone, name='add_passenger_phone'),
 
     #-- passenger --#
@@ -70,13 +70,13 @@ urlpatterns = [
     #-- staff addresses --#
     path('staff_addresses/', views.view_staff_addresses, name='view_staff_addresses'),
     path('staff_addresses/<int:pk>', views.view_staff_address, name='view_staff_address'),
-    path('delete_staff_address/<int:pk>/<str:pk2>', views.delete_staff_address, name='delete_staff_address'),
+    path('delete_staff_address/<int:empnum>/<str:address>', views.delete_staff_address, name='delete_staff_address'),
     path('add_staff_address', views.add_staff_address, name='add_staff_address'),
 
     #-- staff phones --#
     path('staff_phones/', views.view_staff_phones, name='view_staff_phones'),
     path('staff_phones/<int:pk>', views.view_staff_phone, name='view_staff_phone'),
-    path('delete_staff_phone/<int:pk>', views.delete_staff_phone, name='delete_staff_phone'),
+    path('delete_staff_phone/<str:pk>', views.delete_staff_phone, name='delete_staff_phone'),
     path('add_staff_phone', views.add_staff_phone, name='add_staff_phone'),
     
     #-- staff --#

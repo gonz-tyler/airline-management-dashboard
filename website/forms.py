@@ -56,10 +56,20 @@ class AddStaffForm(forms.ModelForm):
     SALARY = forms.DecimalField(required=True, widget=forms.widgets.NumberInput(attrs={"placeholder":"Salary", "class":"form-control"}), label="")
     type_choices = (('Pilot', 'Pilot'),('Crew', 'Crew'),)
     TYPE = forms.ChoiceField(required=True,choices=type_choices,widget=forms.Select(attrs={"class": "form-control"}),label="")
+    pilotnum = forms.CharField(max_length=10, required=False, widget=forms.TextInput(attrs={"placeholder": "Pilot Number", "class": "form-control"}), label="")
 
     class Meta:
         model = Staff
         exclude = ("user",)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        staff_type = cleaned_data.get('TYPE')
+        pilotnum = cleaned_data.get('pilotnum')
+
+        if staff_type == 'Pilot' and not pilotnum:
+            self.add_error('pilotnum', 'Pilot number is required for Pilots.')
+        return cleaned_data
 
 class AddPilotForm(forms.ModelForm):
     PILOTNUM = forms.IntegerField(required=True, widget=forms.widgets.NumberInput(attrs={"placeholder":"Pilot Number", "class":"form-control"}), label="")
@@ -141,19 +151,23 @@ class AddPilotTypeRatingForm(forms.ModelForm):
 
 class AddStaffAddressForm(forms.ModelForm):
     ADDRESSDETAILS = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Address", "class":"form-control"}), label="")
-    EMPNUM = forms.ModelChoiceField(queryset=Staff.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
+    #EMPNUM = forms.ModelChoiceField(queryset=Staff.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
 
     class Meta:
         model = StaffAddress
-        exclude = ("user",)
+        exclude = ("user","EMPNUM")
 
 class AddStaffPhoneForm(forms.ModelForm):
     PHONE = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Phone Number", "class":"form-control"}), label="")
-    EMPNUM = forms.ModelChoiceField(queryset=Staff.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
+    #EMPNUM = forms.ModelChoiceField(queryset=Staff.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
 
     class Meta:
         model = StaffPhone
-        exclude = ("user",)
+        exclude = ("user","EMPNUM")
+
+# Create formsets using the inlineformset_factory
+StaffAddressFormSet = inlineformset_factory(Staff, StaffAddress, form=AddStaffAddressForm, extra=1)
+StaffPhoneFormSet = inlineformset_factory(Staff, StaffPhone, form=AddStaffPhoneForm, extra=1)
 
 class AddStretchForm(forms.ModelForm):
     STRETCHNUM = forms.IntegerField(required=True, widget=forms.widgets.NumberInput(attrs={"placeholder":"Serial Number", "class":"form-control"}), label="")

@@ -1,57 +1,67 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %}
+
+{% block content %}
+
 <div class="col-md-6 offset-md-3">
     <h1>Add Passenger</h1>
     <br />
     <form method="post" id="add-passenger-form">
-        {% csrf_token %} {{ form.as_p }}
+        {% csrf_token %}
+        {{ form.as_p }}
+
         <div id="addresses-container">
-            {{ address_formset.management_form }} {% for form in address_formset %}
+            {{ address_formset.management_form }}
+            {% for form in address_formset %}
             <div class="address-form">
-                {{ form.as_p }}
-                <br />
-                <button type="button" class="btn btn-danger remove-address">
-                    Remove Address
-                </button>
-                <br />
+                <div class="input-button-container">
+                    {{ form.as_p }}
+                    <button type="button" class="btn btn-danger remove-address">
+                        Remove Address
+                    </button>
+                </div>
             </div>
             {% endfor %}
         </div>
-        <br />
+
+
         <button type="button" class="btn btn-primary" id="add-address">
             Add Address
         </button>
-        <br />
+        <br>
+
         <div id="phones-container">
             <br />
-            {{ phone_formset.management_form }} {% for form in phone_formset %}
+            {{ phone_formset.management_form }}
+            {% for form in phone_formset %}
             <div class="phone-form">
-                {{ form.as_p }}
-                <br />
-                <button type="button" class="btn btn-danger remove-phone">
-                    Remove Phone
-                </button>
-                <br />
+                <div class="input-button-container">
+                    {{ form.as_p }}
+                    <button type="button" class="btn btn-danger remove-phone">
+                        Remove Phone
+                    </button>
+                </div>
             </div>
             {% endfor %}
         </div>
-        <br />
+        <br>
+
         <button type="button" class="btn btn-primary" id="add-phone">
             Add Phone
         </button>
+
         <br />
         <br />
+        <a href="{% url 'view_passengers' %}" class="btn btn-secondary">Back</a>
         <button type="submit" class="btn btn-success">Save Passenger</button>
         <br />
     </form>
+
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
     $(document).ready(function () {
-        var addresses = []; // Array to store addresses
-        var phones = []; // Array to store phones
-
         // Add address
         $("#add-address").click(function () {
             var container = $("#addresses-container");
@@ -78,26 +88,13 @@
                 "input[name$='-ADDRESSDETAILS']"
             ).length;
             if (totalForms > 1) {
-                $(this).parent().remove();
+                $(this).closest(".address-form").remove();
             }
             toggleRemoveButtons();
         });
 
-        // Collect addresses
-        function collectAddresses() {
-            addresses = [];
-            $("#addresses-container")
-                .find("input[name$='-ADDRESSDETAILS']")
-                .each(function () {
-                    var address = $(this).val();
-                    if (address.trim() !== "") {
-                        addresses.push(address);
-                    }
-                });
-        }
-
         // Add phone
-        $("#add-address").click(function () {
+        $("#add-phone").click(function () {
             var container = $("#phones-container");
             var totalForms = container.find("input[name$='-PHONE']").length;
             var newForm = container.find("div.phone-form:first").clone(true);
@@ -122,86 +119,24 @@
                 "input[name$='-PHONE']"
             ).length;
             if (totalForms > 1) {
-                $(this).parent().remove();
+                $(this).closest(".phone-form").remove();
             }
             toggleRemoveButtons();
         });
 
-        // Collect phones
-        function collectPhones() {
-            phones = [];
-            $("#phones-container")
-                .find("input[name$='-PHONE']")
-                .each(function () {
-                    var phone = $(this).val();
-                    if (phone.trim() !== "") {
-                        phones.push(phone);
-                    }
-                });
-        }
-
-        // Submit form
-        //        $("#add-passenger-form").submit(function(event) {
-        //            collectAddresses(); // Collect addresses before submitting
-        // Now 'addresses' contains all addresses entered by the user
-        // You can send this 'addresses' list to the backend through AJAX or include it in the form data
-        //            console.log(addresses); // For demonstration, you can see the collected addresses in the browser console
-        // Example AJAX request:
-        // $.ajax({
-        //     url: '/your-backend-url/',
-        //     type: 'POST',
-        //     data: {
-        //         addresses: addresses
-        //     },
-        //     success: function(response) {
-        //         // Handle success response
-        //     },
-        //     error: function(xhr, errmsg, err) {
-        //         // Handle error
-        //     }
-        // });
-        //            event.preventDefault(); // Prevent default form submission
-        //        });
-        // Serialize form data to JSON before submission
-//        $("#add-passenger-form").submit(function (event) {
-//            event.preventDefault();
-//            var formData = $(this).serializeArray();
-//            console.log("form data ", formData);});
-//            var jsonData = {};
-//            formData.forEach(function (field) {
-//                if (jsonData.hasOwnProperty(field.name)) {
-//                    if (!Array.isArray(jsonData[field.name])) {
-//                        jsonData[field.name] = [jsonData[field.name]];
-//                    }
-//                    jsonData[field.name].push(field.value);
-//                } else {
-//                    jsonData[field.name] = field.value;
-//                }
-//            });
-//            console.log("json data ", jsonData);
-//            $.ajax({
-//                url: $(this).attr("action"),
-//                type: "POST",
-//                contentType: "application/json",
-//                data: JSON.stringify(jsonData),
-//                success: function (response) {
-//                    // Handle success response
-//                    console.log(response);
-//                },
-//                error: function (xhr, errmsg, err) {
-//                    // Handle error
-//                    console.log("failed to send data to backend");
-//                },
-//          });
-//      });
-
         // Toggle remove buttons
         function toggleRemoveButtons() {
             var addressForms = $("#addresses-container").find(".address-form");
+            var phoneForms = $("#phones-container").find(".phone-form");
             if (addressForms.length === 1) {
                 addressForms.find(".remove-address").hide();
             } else {
                 addressForms.find(".remove-address").show();
+            }
+            if (phoneForms.length === 1) {
+                phoneForms.find(".remove-phone").hide();
+            } else {
+                phoneForms.find(".remove-phone").show();
             }
         }
 

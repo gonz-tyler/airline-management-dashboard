@@ -2,15 +2,16 @@
 {%block content%}
 
 <div class="card">
-    <h5 class="card-header">City Airport Code {{city.CITYCODE}} </h5>
-    <div class="card-body">
-        <p class="list-group-item"><strong>Name: </strong>{{ city.CITYNAME }}</p>
+  <h5 class="card-header">City Airport Code {{city.CITYCODE}} </h5>
+  <div class="card-body">
+    <p class="list-group-item"><strong>Name: </strong>{{ city.CITYNAME }}</p>
 
-        <a onclick="history.back()" class="btn btn-secondary">Back</a>
-        {% if user.is_superuser %}
-        <a href="{% url 'delete_city' city.CITYCODE %}" class="btn btn-danger">Delete</a>
-        {% endif %}
-    </div>
+    <a onclick="history.back()" class="btn btn-secondary">Back</a>
+    {% if user.is_superuser %}
+    <a href="{% url 'delete_city' city.CITYCODE %}" class="btn btn-danger">Delete</a>
+    <a href="{% url 'update_city' city.CITYCODE %}" class="btn btn-danger">Update</a>
+    {% endif %}
   </div>
+</div>
 
 {%endblock%}
