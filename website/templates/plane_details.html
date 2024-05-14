@@ -1,17 +1,18 @@
 {%extends 'base.html' %}
 {%block content%}
 
-    <div class="card">
-        <h5 class="card-header">Plane Number {{plane.SERIALNUM}} </h5>
-        <div class="card-body">
-            <p class="list-group-item"><strong>Manufacturer: </strong>{{ plane.MANUFACTURER }}</p>
-            <p class="list-group-item"><strong>Model: </strong>{{ plane.MODEL }}</p>
-            
-            <a onclick="history.back()" class="btn btn-secondary">Back</a>
-            {% if user.is_superuser %}
-            <a href="{% url 'delete_plane' plane.SERIALNUM %}" class="btn btn-danger">Delete</a>
-            {% endif %}
-        </div>
-      </div>
+<div class="card">
+    <h5 class="card-header">Plane Number {{plane.SERIALNUM}} </h5>
+    <div class="card-body">
+        <p class="list-group-item"><strong>Manufacturer: </strong>{{ plane.MANUFACTURER }}</p>
+        <p class="list-group-item"><strong>Model: </strong>{{ plane.MODEL }}</p>
+
+        <a onclick="history.back()" class="btn btn-secondary">Back</a>
+        {% if user.is_superuser %}
+        <a href="{% url 'delete_plane' plane.SERIALNUM %}" class="btn btn-danger">Delete</a>
+        <a href="{% url 'update_plane' plane.SERIALNUM %}" class="btn btn-primary">Update</a>
+        {% endif %}
+    </div>
+</div>
 
 {%endblock%}

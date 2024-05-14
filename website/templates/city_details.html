@@ -9,7 +9,7 @@
     <a onclick="history.back()" class="btn btn-secondary">Back</a>
     {% if user.is_superuser %}
     <a href="{% url 'delete_city' city.CITYCODE %}" class="btn btn-danger">Delete</a>
-    <a href="{% url 'update_city' city.CITYCODE %}" class="btn btn-danger">Update</a>
+    <a href="{% url 'update_city' city.CITYCODE %}" class="btn btn-primary">Update</a>
     {% endif %}
   </div>
 </div>

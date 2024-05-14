@@ -12,12 +12,14 @@ urlpatterns = [
     path('planes/<int:pk>', views.view_plane, name='view_plane'),
     path('delete_plane/<int:pk>', views.delete_plane, name='delete_plane'),
     path('add_plane', views.add_plane, name='add_plane'),
+    path('update_plane/<int:pk>', views.update_plane, name='update_plane'),
 
     #-- cities --#
     path('cities/', views.view_cities, name='view_cities'),
     path('cities/<str:pk>', views.view_city, name='view_city'),
     path('delete_city/<str:pk>', views.delete_city, name='delete_city'),
     path('add_city', views.add_city, name='add_city'),
+    path('update_city/<str:pk>', views.update_city, name='update_city'),
 
     #-- flight crews --#
     path('crews/', views.view_crews, name='view_crews'),
@@ -30,6 +32,7 @@ urlpatterns = [
     path('flights/<int:pk>', views.view_flight, name='view_flight'),
     path('delete_flight/<int:pk>', views.delete_flight, name='delete_flight'),
     path('add_flight', views.add_flight, name='add_flight'),
+    path('update_flight/<int:pk>', views.update_flight, name='update_flight'),
 
     #-- passenger address --#
     path('passenger_addresses/', views.view_passenger_addresses, name='view_passenger_addresses'),
@@ -54,6 +57,7 @@ urlpatterns = [
     path('passengers/<int:pk>', views.view_passenger, name='view_passenger'),
     path('delete_passenger/<int:pk>', views.delete_passenger, name='delete_passenger'),
     path('add_passenger', views.add_passenger, name='add_passenger'),
+    path('update_passenger/<int:pk>', views.update_passenger, name='update_passenger'),
 
     #-- pilot typeratings --#
     path('pilot_typeratings/', views.view_pilot_typeratings, name='view_pilot_typeratings'),
@@ -66,6 +70,7 @@ urlpatterns = [
     path('pilots/<int:pk>', views.view_pilot, name='view_pilot'),
     path('delete_pilot/<int:pk>', views.delete_pilot, name='delete_pilot'),
     path('add_pilot', views.add_pilot, name='add_pilot'),
+    path('update_pilot/<int:pk>', views.update_pilot, name='update_pilot'),
 
     #-- staff addresses --#
     path('staff_addresses/', views.view_staff_addresses, name='view_staff_addresses'),
@@ -84,6 +89,7 @@ urlpatterns = [
     path('staff/<int:pk>', views.view_staff_member, name='view_staff_member'),
     path('delete_staff/<int:pk>', views.delete_staff_member, name='delete_staff_member'),
     path('add_staff_member', views.add_staff_member, name='add_staff_member'),
+    path('update_Staff_member/<int:pk>', views.update_staff_member, name='update_staff_member'),
     
     #-- stretch --#
     path('stretches/', views.view_stretches, name='view_stretches'),

@@ -85,6 +85,7 @@
         <a onclick="history.back()" class="btn btn-secondary">Back</a>
         {% if user.is_superuser %}
         <a href="{% url 'delete_staff_member' staff_member.EMPNUM %}" class="btn btn-danger">Delete</a>
+        <a href="{% url 'update_staff_member' staff_member.EMPNUM %}" class="btn btn-primary">Update</a>
         {% endif %}
     </div>
 </div>

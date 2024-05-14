@@ -89,6 +89,19 @@ def add_plane(request):
         messages.success(request, f"You must be logged in...")
         return redirect("home")
 
+def update_plane(request, pk):
+	if request.user.is_authenticated:
+		current_record = Airplane.objects.get(SERIALNUM=pk)
+		form = AddAirplaneForm(request.POST or None, instance=current_record)
+		if form.is_valid():
+			form.save()
+			messages.success(request, "Record Has Been Updated!")
+			return redirect('home')
+		return render(request, 'update_plane.html', {'form':form})
+	else:
+		messages.success(request, "You Must Be Logged In...")
+		return redirect('home')
+
 #-- Cities --#    
 def view_cities(request):
     if request.user.is_authenticated:
@@ -136,7 +149,7 @@ def update_city(request, pk):
 		if form.is_valid():
 			form.save()
 			messages.success(request, "Record Has Been Updated!")
-			return redirect('view_cities')
+			return redirect('home')
 		return render(request, 'update_city.html', {'form':form})
 	else:
 		messages.success(request, "You Must Be Logged In...")
@@ -226,6 +239,19 @@ def add_flight(request):
     else:
         messages.success(request, f"You must be logged in...")
         return redirect("home")
+    
+def update_flight(request, pk):
+	if request.user.is_authenticated:
+		current_record = Flight.objects.get(FLIGHTNUM=pk)
+		form = AddFlightForm(request.POST or None, instance=current_record)
+		if form.is_valid():
+			form.save()
+			messages.success(request, "Record Has Been Updated!")
+			return redirect('home')
+		return render(request, 'update_flight.html', {'form':form})
+	else:
+		messages.success(request, "You Must Be Logged In...")
+		return redirect('home')
 
 #-- Passenger Addresses --#    
 def view_passenger_addresses(request):
@@ -470,6 +496,19 @@ def add_passenger(request):
         return redirect("home")
     return render(request, 'add_passenger.html', {"form": form, "address_formset": address_forms, "phone_formset": phone_forms})
 
+def update_passenger(request, pk):
+	if request.user.is_authenticated:
+		current_record = Passenger.objects.get(CITYCODE=pk)
+		form = AddPassengerForm(request.POST or None, instance=current_record)
+		if form.is_valid():
+			form.save()
+			messages.success(request, "Record Has Been Updated!")
+			return redirect('home')
+		return render(request, 'update_passenger.html', {'form':form})
+	else:
+		messages.success(request, "You Must Be Logged In...")
+		return redirect('home')
+
 #-- Pilot Typeratings --#
 def view_pilot_typeratings(request):
     if request.user.is_authenticated:
@@ -551,6 +590,19 @@ def add_pilot(request):
     else:
         messages.success(request, f"You must be logged in...")
         return redirect("home")
+    
+def update_pilot(request, pk):
+	if request.user.is_authenticated:
+		current_record = Pilot.objects.get(PILOTNUM=pk)
+		form = AddPilotForm(request.POST or None, instance=current_record)
+		if form.is_valid():
+			form.save()
+			messages.success(request, "Record Has Been Updated!")
+			return redirect('home')
+		return render(request, 'update_pilot.html', {'form':form})
+	else:
+		messages.success(request, "You Must Be Logged In...")
+		return redirect('home')
 
 #-- Staff Addresses --#
 def view_staff_addresses(request):
@@ -773,17 +825,18 @@ def add_staff_member(request):
         return redirect("home")
     return render(request, 'add_staff_member.html', {"form": form, "address_formset": address_forms, "phone_formset": phone_forms})
 
-    form = AddStaffForm(request.POST or None)
-    if request.user.is_authenticated:
-        if request.method == "POST":
-            if form.is_valid():
-                add_staff_member = form.save()
-                messages.success(request, f"Record Added...")
-                return redirect("home")
-        return render(request, 'add_staff_member.html', {"form": form})
-    else:
-        messages.success(request, f"You must be logged in...")
-        return redirect("home")
+def update_staff_member(request, pk):
+	if request.user.is_authenticated:
+		current_record = Staff.objects.get(EMPNUM=pk)
+		form = AddStaffForm(request.POST or None, instance=current_record)
+		if form.is_valid():
+			form.save()
+			messages.success(request, "Record Has Been Updated!")
+			return redirect('home')
+		return render(request, 'update_staff_member.html', {'form':form})
+	else:
+		messages.success(request, "You Must Be Logged In...")
+		return redirect('home')
 
 #-- Stretch --#    
 def view_stretches(request):
