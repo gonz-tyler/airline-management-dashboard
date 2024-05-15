@@ -32,35 +32,74 @@
             {{ flight.PLANENUM.SERIALNUM }} {{ flight.PLANENUM.MANUFACTURER }} {{ flight.PLANENUM.MODEL }}</a></p>
         {% if crew %}
         <h5>Crew:</h5>
-        <ul>
-            {% for crew_member in crew %}
-            <li><a href="{% url 'view_staff_member' crew_member.EMPNUM.EMPNUM %}">
-                    {{ crew_member.EMPNUM.EMPNUM }} {{crew_member.EMPNUM.NAME }} {{ crew_member.EMPNUM.SURNAME }}
-                </a>
-                <a href="{% url 'delete_crew' flight.FLIGHTNUM crew_member.EMPNUM.EMPNUM %}" class="btn btn-danger">
-                    Remove
-                </a>
-            </li>
-            {% endfor %}
-        </ul>
+        <a href="{% url 'add_crew' flight.FLIGHTNUM %}" class="btn btn-outline-success btn-sm">
+            Add Crew
+        </a>
+        <table class="table table-hover table-sm">
+            <thead class="">
+                <tr>
+                    <th scope="col">Employee Number</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Surname</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for crew_member in crew %}
+                <tr>
+                    <td><a href="{% url 'view_staff_member' crew_member.EMPNUM.EMPNUM %}">
+                            {{ crew_member.EMPNUM.EMPNUM }}
+                        </a></td>
+                    <td>{{ crew_member.EMPNUM.NAME }}</td>
+                    <td>{{ crew_member.EMPNUM.SURNAME }}</td>
+                    <td><a href="{% url 'delete_crew' flight.FLIGHTNUM crew_member.EMPNUM.EMPNUM %}"
+                            class="btn btn-outline-danger btn-sm">
+                            Remove
+                        </a>
+                    </td>
+                </tr>
+                {%endfor%}
+            </tbody>
+        </table>
         {% endif %}
         {% if passengers %}
         <h5>Passengers:</h5>
-        <ul>
-            {% for passenger in passengers %}
-            <li><a href="{% url 'view_passenger' passenger.PASSENGERNUM.PASSENGERNUM %}">
-                    {{ passenger.PASSENGERNUM.PASSENGERNUM }} {{ passenger.PASSENGERNUM.NAME }}
-                    {{ passenger.PASSENGERNUM.SURNAME }}
-                </a>
-                <a href="{% url 'delete_passenger_booking' flight.FLIGHTNUM passenger.PASSENGERNUM.PASSENGERNUM %}"
-                    class="btn btn-danger">
-                    Remove
-                </a>
-            </li>
-            {% endfor %}
-        </ul>
+        <a href="{% url 'add_passenger_booking' flight.FLIGHTNUM %}" class="btn btn-outline-success btn-sm">
+            Add Passenger
+        </a>
+        <table class="table table-hover table-sm">
+            <thead class="">
+                <tr>
+                    <th scope="col">Passenger Number</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Surname</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for passenger in passengers %}
+                <tr>
+                    <td><a href="{% url 'view_passenger' passenger.PASSENGERNUM.PASSENGERNUM %}">
+                            {{ passenger.PASSENGERNUM.PASSENGERNUM }}
+                        </a></td>
+                    <td>{{ passenger.PASSENGERNUM.NAME }}</td>
+                    <td>{{ passenger.PASSENGERNUM.SURNAME }}</td>
+                    <td><a href="{% url 'delete_passenger_booking' flight.FLIGHTNUM passenger.PASSENGERNUM.PASSENGERNUM %}"
+                            class="btn btn-outline-danger btn-sm">
+                            Remove
+                        </a>
+                    </td>
+                </tr>
+                {%endfor%}
+            </tbody>
+        </table>
         {% endif %}
-        <a onclick="history.back()" class="btn btn-secondary">Back</a>
+        {% if typeratings %}
+        <h5>Type Ratings:</h5>
+        <a href="{% url 'add_pilot_typerating' staff_member.EMPNUM %}" class="btn btn-outline-success btn-sm">
+            Add Type Rating
+        </a>
+
+        {% endif %}
+        <a href="{% url 'home' %}" class="btn btn-secondary">Back</a>
         {% if user.is_superuser %}
         <a href="{% url 'delete_flight' flight.FLIGHTNUM %}" class="btn btn-danger">Delete</a>
         <a href="{% url 'update_flight' flight.FLIGHTNUM %}" class="btn btn-primary">Update</a>

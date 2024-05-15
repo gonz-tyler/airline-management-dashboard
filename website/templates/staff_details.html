@@ -10,6 +10,9 @@
         <p class="list-group-item"><strong>Type: </strong>{{ staff_member.TYPE }}</p>
 
         <h5>Addresses:</h5>
+        <a href="{% url 'add_staff_address' staff_member.EMPNUM %}" class="btn btn-outline-success btn-sm">
+            Add Address
+        </a>
         <ul>
             {% for address in addresses %}
             <li>{{ address.ADDRESSDETAILS }}</li>
@@ -19,6 +22,9 @@
         </ul>
 
         <h5>Phones:</h5>
+        <a href="{% url 'add_staff_phone' staff_member.EMPNUM %}" class="btn btn-outline-success btn-sm">
+            Add Phone
+        </a>
         <ul>
             {% for phone in phones %}
             <li>{{ phone.PHONE }}</li>
@@ -29,6 +35,9 @@
         </ul>
         {% if typeratings %}
         <h5>Type Ratings:</h5>
+        <a href="{% url 'add_pilot_typerating' staff_member.EMPNUM %}" class="btn btn-outline-success btn-sm">
+            Add Type Rating
+        </a>
         <table class="table table-hover table-sm">
             <thead class="">
                 <tr>
@@ -41,6 +50,8 @@
                 <tr>
                     <td>{{ typerating.TYPERATING }}</td>
                     <td>{{ typerating.DATEEARNED }}</td>
+                    <td><a href="{% url 'delete_pilot_typerating' typerating.PILOTNUM.PILOTNUM typerating.TYPERATING %}"
+                            class="btn btn-danger">Delete</a></td>
                 </tr>
                 {%endfor%}
             </tbody>

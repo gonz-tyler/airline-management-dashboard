@@ -8,6 +8,9 @@
         <p class="list-group-item"><strong>Surname: </strong>{{ passenger.SURNAME }}</p>
         {% if addresses %}
         <h5>Addresses:</h5>
+        <a href="{% url 'add_passenger_address' passenger.PASSENGERNUM %}" class="btn btn-outline-success btn-sm">
+            Add Address
+        </a>
         <ul>
             {% for address in addresses %}
             <li>{{ address.ADDRESSDETAILS }}</li>
@@ -15,9 +18,11 @@
                 class="btn btn-danger">Delete</a>
             {% endfor %}
         </ul>
-        {% endif %}
-        {% if phones %}
+
         <h5>Phones:</h5>
+        <a href="{% url 'add_passenger_phone' passenger.PASSENGERNUM %}" class="btn btn-outline-success btn-sm">
+            Add Phone
+        </a>
         <ul>
             {% for phone in phones %}
             <li>{{ phone.PHONE }}</li>
