@@ -6,6 +6,17 @@
     <div class="card-body">
         <p class="list-group-item">
         <h5>Origin: </h5>{{ flight.ORIGINCITYCODE.CITYCODE }}</p>
+        {% if stretches %}
+        <h5>Stretches: </h5>
+        <ul>
+            {% for stretch in stretches %}
+            <li><a href="{% url 'view_stretch' stretch.STRETCHNUM %}">
+                    {{ stretch.ORIGINCITYCODE.CITYCODE }}
+                    {{ stretch.DESTCITYCODE.CITYCODE }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
         <p class="list-group-item">
         <h5>Destination: </h5>{{ flight.DESTCITYCODE.CITYCODE }}</p>
         <p class="list-group-item">
@@ -24,7 +35,11 @@
         <ul>
             {% for crew_member in crew %}
             <li><a href="{% url 'view_staff_member' crew_member.EMPNUM.EMPNUM %}">
-                    {{ crew_member.EMPNUM.EMPNUM }} {{crew_member.EMPNUM.NAME }} {{ crew_member.EMPNUM.SURNAME }}</a>
+                    {{ crew_member.EMPNUM.EMPNUM }} {{crew_member.EMPNUM.NAME }} {{ crew_member.EMPNUM.SURNAME }}
+                </a>
+                <a href="{% url 'delete_crew' flight.FLIGHTNUM crew_member.EMPNUM.EMPNUM %}" class="btn btn-danger">
+                    Remove
+                </a>
             </li>
             {% endfor %}
         </ul>
@@ -35,7 +50,13 @@
             {% for passenger in passengers %}
             <li><a href="{% url 'view_passenger' passenger.PASSENGERNUM.PASSENGERNUM %}">
                     {{ passenger.PASSENGERNUM.PASSENGERNUM }} {{ passenger.PASSENGERNUM.NAME }}
-                    {{ passenger.PASSENGERNUM.SURNAME }}</a></li>
+                    {{ passenger.PASSENGERNUM.SURNAME }}
+                </a>
+                <a href="{% url 'delete_passenger_booking' flight.FLIGHTNUM passenger.PASSENGERNUM.PASSENGERNUM %}"
+                    class="btn btn-danger">
+                    Remove
+                </a>
+            </li>
             {% endfor %}
         </ul>
         {% endif %}

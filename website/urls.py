@@ -24,7 +24,7 @@ urlpatterns = [
     #-- flight crews --#
     path('crews/', views.view_crews, name='view_crews'),
     path('crews/<int:pk>', views.view_crew, name='view_crew'),
-    path('delete_crew/<int:pk>', views.delete_crew, name='delete_crew'),
+    path('delete_crew/<int:flight_number>/<int:employee_number>', views.delete_crew, name='delete_crew'),
     path('add_crew', views.add_crew, name='add_crew'),
 
     #-- flights --#
@@ -43,7 +43,7 @@ urlpatterns = [
     #-- passenger booking --#
     path('bookings/', views.view_passenger_bookings, name='view_passenger_bookings'),
     path('bookings/<int:pk>', views.view_passenger_booking, name='view_passenger_booking'),
-    path('delete_booking/<int:pk>', views.delete_passenger_booking, name='delete_passenger_booking'),
+    path('delete_booking/<int:flight_num>/<int:passenger_num>', views.delete_passenger_booking, name='delete_passenger_booking'),
     path('add_booking', views.add_passenger_booking, name='add_passenger_booking'),
 
     #-- passenger phone --#

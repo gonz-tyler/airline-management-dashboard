@@ -210,7 +210,8 @@ def view_flight(request, pk):
         flight = Flight.objects.get(FLIGHTNUM=pk)
         passengers = PassengerBooking.objects.filter(FLIGHTNUM=pk)
         crew = FlightCrew.objects.filter(FLIGHTNUM=pk)
-        return render(request, 'flight_details.html', {'flight':flight, 'passengers': passengers, 'crew': crew})
+        stretches = Stretch.objects.filter(FLIGHTNUM=pk)
+        return render(request, 'flight_details.html', {'flight':flight, 'passengers': passengers, 'crew': crew, 'stretches': stretches})
     else:
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')
@@ -309,9 +310,9 @@ def view_passenger_booking(request, passenger_num, flight_num):
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')
     
-def delete_passenger_booking(request, passenger_num, flight_num):
+def delete_passenger_booking(request, flight_num, passenger_num):
     if request.user.is_authenticated:
-        delete_it = PassengerBooking.objects.get(PASSENGERNUM=passenger_num, FIGHTNUM=flight_num)
+        delete_it = PassengerBooking.objects.get(PASSENGERNUM=passenger_num, FLIGHTNUM=flight_num)
         delete_it.delete()
         # Add a success message
         messages.success(request, f"Passenger booking with flight number {flight_num} and passenger number {passenger_num} deleted successfully.")
