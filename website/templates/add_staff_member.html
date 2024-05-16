@@ -6,10 +6,47 @@
     <br>
     <form method="POST" action="{% url 'add_staff_member' %}">
         {% csrf_token %}
-        {{ form.as_p }}
+
         <!--<div id="pilotnum-container" style="display: none;">
             {{ form.pilotnum }}
         </div>-->
+        <div class="form-group">
+            {{ form.EMPNUM.label_tag }}
+            {{ form.EMPNUM }}
+        </div>
+
+        <div class="form-group">
+            {{ form.SURNAME.label_tag }}
+            {{ form.SURNAME }}
+        </div>
+
+        <div class="form-group">
+            {{ form.NAME.label_tag }}
+            {{ form.NAME }}
+        </div>
+        <br>
+        <div class="form-group">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">$</span>
+                </div>
+                {{ form.SALARY }}
+                <div class="input-group-append">
+                    <span class="input-group-text">.00</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            {{ form.TYPE.label_tag }}
+            {{ form.TYPE }}
+        </div>
+
+        <div class="form-group">
+            {{ form.pilotnum.label_tag }}
+            {{ form.pilotnum }}
+        </div>
+        <br>
         <div id="addresses-container">
             {{ address_formset.management_form }}
             {% for form in address_formset %}

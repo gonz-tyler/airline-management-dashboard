@@ -74,7 +74,7 @@ class AddStaffForm(forms.ModelForm):
 class AddPilotForm(forms.ModelForm):
     PILOTNUM = forms.IntegerField(required=True, widget=forms.widgets.NumberInput(attrs={"placeholder":"Pilot Number", "class":"form-control"}), label="")
     pilot_choices = Staff.objects.filter(TYPE='Pilot')
-    EMPNUM = forms.ModelChoiceField(queryset=pilot_choices, widget=forms.Select(attrs={"class": "form-control"}), label="")
+    EMPNUM = forms.ModelChoiceField(queryset=pilot_choices, widget=forms.Select(attrs={"class": "form-control"}), label="", empty_label="Select a Staff Member")
 
     class Meta:
         model = Pilot
@@ -82,25 +82,52 @@ class AddPilotForm(forms.ModelForm):
 
 class AddFlightForm(forms.ModelForm):
     FLIGHTNUM = forms.IntegerField(required=True, widget=forms.widgets.NumberInput(attrs={"placeholder":"Flight Number", "class":"form-control"}), label="")
-    ORIGINCITYCODE = forms.ModelChoiceField(queryset=City.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
-    DESTCITYCODE = forms.ModelChoiceField(queryset=City.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
-    DEPTIME = forms.DateTimeField(widget=forms.DateTimeInput(attrs={"class": "form-control", "placeholder": "YYYY-MM-DD HH:MM:SS"}), label="")
-    ARRTIME = forms.DateTimeField(widget=forms.DateTimeInput(attrs={"class": "form-control", "placeholder": "YYYY-MM-DD HH:MM:SS"}), label="")
-    PILOTNUM = forms.ModelChoiceField(queryset=Pilot.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
-    PLANENUM = forms.ModelChoiceField(queryset=Airplane.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
+    ORIGINCITYCODE = forms.ModelChoiceField(queryset=City.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="", empty_label="Select a City")
+    DESTCITYCODE = forms.ModelChoiceField(queryset=City.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="", empty_label="Select a City")
+    DEPTIME = forms.DateTimeField(widget=forms.widgets.DateTimeInput(attrs={"class": "form-control datetimepicker-input",
+                                                                    "placeholder": "YYYY-MM-DD HH:MM:SS",
+                                                                    "data-target": "#datetimepicker1"}), label="")
+    ARRTIME = forms.DateTimeField(widget=forms.widgets.DateTimeInput(attrs={"class": "form-control datetimepicker-input",
+                                                                    "placeholder": "YYYY-MM-DD HH:MM:SS",
+                                                                    "data-target": "#datetimepicker2"}), label="")
+    PILOTNUM = forms.ModelChoiceField(queryset=Pilot.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="", empty_label="Select a Pilot")
+    PLANENUM = forms.ModelChoiceField(queryset=Airplane.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="", empty_label="Select a Plane")
 
     class Meta:
         model = Flight
         exclude = ("user",)
 
+    def __init__(self, *args, **kwargs):
+        super(AddFlightForm, self).__init__(*args, **kwargs)
+        self.fields['PLANENUM'].label_from_instance = self.plane_label_from_instance
+        self.fields['ORIGINCITYCODE'].label_from_instance = self.city_label_from_instance
+        self.fields['DESTCITYCODE'].label_from_instance = self.city_label_from_instance
+        self.fields['PILOTNUM'].label_from_instance = self.pilot_label_from_instance
+
+    def plane_label_from_instance(self, obj):
+        return f"{obj.SERIALNUM} - {obj.MANUFACTURER} - {obj.MODEL}"
+
+    def city_label_from_instance(self, obj):
+        return f"{obj.CITYCODE} - {obj.CITYNAME}"
+
+    def pilot_label_from_instance(self, obj):
+        return f"{obj.PILOTNUM} - {obj.EMPNUM.NAME} {obj.EMPNUM.SURNAME}"
+
 class AddFlightCrewForm(forms.ModelForm):
     FLIGHTNUM = forms.ModelChoiceField(queryset=Flight.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
     crew_choices = Staff.objects.filter(TYPE='Crew')
-    EMPNUM = forms.ModelChoiceField(queryset=crew_choices, widget=forms.Select(attrs={"class": "form-control"}), label="")
+    EMPNUM = forms.ModelChoiceField(queryset=crew_choices, widget=forms.Select(attrs={"class": "form-control"}), label="", empty_label="Select a Crew Member")
 
     class Meta:
         model = FlightCrew
         exclude = ("user",)
+
+    def __init__(self, *args, **kwargs):
+        super(AddFlightCrewForm, self).__init__(*args, **kwargs)
+        self.fields['EMPNUM'].label_from_instance = self.staff_label_from_instance
+
+    def staff_label_from_instance(self, obj):
+        return f"{obj.EMPNUM} - {obj.NAME} - {obj.SURNAME}"
 
 class AddPassengerForm(forms.ModelForm):
     PASSENGERNUM = forms.IntegerField(required=True, widget=forms.widgets.NumberInput(attrs={"placeholder":"Passenger Number", "class":"form-control"}), label="")
@@ -133,12 +160,20 @@ PassengerAddressFormSet = inlineformset_factory(Passenger, PassengerAddress, for
 PassengerPhoneFormSet = inlineformset_factory(Passenger, PassengerPhone, form=AddPassengerPhoneForm, extra=1)
 
 class AddPassengerBookingForm(forms.ModelForm):
-    PASSENGERNUM = forms.ModelChoiceField(queryset=Passenger.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
+    PASSENGERNUM = forms.ModelChoiceField(queryset=Passenger.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="", empty_label="Select a Passenger")
     FLIGHTNUM = forms.ModelChoiceField(queryset=Flight.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
 
     class Meta:
         model = PassengerBooking
         exclude = ("user",)
+
+    def __init__(self, *args, **kwargs):
+        super(AddPassengerBookingForm, self).__init__(*args, **kwargs)
+        self.fields['PASSENGERNUM'].label_from_instance = self.passenger_label_from_instance
+
+    def passenger_label_from_instance(self, obj):
+        return f"{obj.PASSENGERNUM} - {obj.NAME} - {obj.SURNAME}"
+
 
 class AddPilotTypeRatingForm(forms.ModelForm):
     TYPERATING = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Type Rating", "class":"form-control"}), label="")
@@ -169,14 +204,20 @@ class AddStaffPhoneForm(forms.ModelForm):
 StaffAddressFormSet = inlineformset_factory(Staff, StaffAddress, form=AddStaffAddressForm, extra=1)
 StaffPhoneFormSet = inlineformset_factory(Staff, StaffPhone, form=AddStaffPhoneForm, extra=1)
 
-class AddStretchForm(forms.ModelForm):
-    STRETCHNUM = forms.IntegerField(required=True, widget=forms.widgets.NumberInput(attrs={"placeholder":"Serial Number", "class":"form-control"}), label="")
-    ORIGINCITYCODE = forms.ModelChoiceField(queryset=City.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
-    DESTCITYCODE = forms.ModelChoiceField(queryset=City.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
+class AddIntermediateCityForm(forms.ModelForm):
+    INTERMEDIATECITYCODE = forms.ModelChoiceField(queryset=City.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="", empty_label="Select a City")
     FLIGHTNUM = forms.ModelChoiceField(queryset=Flight.objects.all(), widget=forms.Select(attrs={"class": "form-control"}), label="")
     ARRTIME = forms.DateTimeField(widget=forms.DateTimeInput(attrs={"class": "form-control", "placeholder": "YYYY-MM-DD HH:MM:SS"}), label="")
     DEPTIME = forms.DateTimeField(widget=forms.DateTimeInput(attrs={"class": "form-control", "placeholder": "YYYY-MM-DD HH:MM:SS"}), label="")
 
     class Meta:
-        model = Stretch
+        model = IntermediateCity
         exclude = ("user",)
+    
+    def __init__(self, *args, **kwargs):
+        super(AddIntermediateCityForm, self).__init__(*args, **kwargs)
+        self.fields['INTERMEDIATECITYCODE'].label_from_instance = self.city_label_from_instance
+
+    def city_label_from_instance(self, obj):
+        return f"{obj.CITYCODE} - {obj.CITYNAME}"
+    

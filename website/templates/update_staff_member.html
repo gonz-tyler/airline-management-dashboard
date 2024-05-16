@@ -2,7 +2,7 @@
 {% block content %}
 
 <div class="col-md-6 offset-md-3">
-    <h1>Update Staff Member</h1>
+    <h1>Update Staff Member {{ employee_num }}</h1>
     <br>
 
     <form method="POST">
@@ -10,7 +10,7 @@
 
         {{ form.as_p }}
         <br>
-        <a href="{% url 'view_staff' %}" class="btn btn-secondary">Back</a>
+        <a href="{% url 'view_staff_member' employee_num %}" class="btn btn-secondary">Back</a>
         <button type="submit" class="btn btn-primary">Update Staff Member</button>
 
 

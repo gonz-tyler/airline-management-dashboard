@@ -1,7 +1,47 @@
 {% extends 'base.html' %}
 {% block content %}
 
+
 <div class="col-md-6 offset-md-3">
+    <h1>Add Flight</h1>
+    <form method="POST" action="{% url 'add_flight' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="form-group">
+            <label for="datetimepicker1">Departure Time</label>
+            <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
+                <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker1" />
+                <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="datetimepicker2">Arrival Time</label>
+            <div class="input-group date" id="datetimepicker2" data-target-input="nearest">
+                <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker2" />
+                <div class="input-group-append" data-target="#datetimepicker2" data-toggle="datetimepicker">
+                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                </div>
+            </div>
+        </div>
+        <a href="{% url 'home' %}" class="btn btn-secondary">Back</a>
+        <button type="submit" class="btn btn-primary">Save Flight</button>
+    </form>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $('#datetimepicker1').datetimepicker({
+            format: 'YYYY-MM-DD HH:mm:ss'
+        });
+        $('#datetimepicker2').datetimepicker({
+            format: 'YYYY-MM-DD HH:mm:ss'
+        });
+    });
+</script>
+{%endblock%}
+
+<!--<div class="col-md-6 offset-md-3">
     <h1>Add Flight</h1>
     <br>
 
@@ -9,6 +49,7 @@
         {% csrf_token %}
 
         {{ form.as_p }}
+
         <br>
         <a href="{% url 'home' %}" class="btn btn-secondary">Back</a>
         <button type="submit" class="btn btn-primary">Save Flight</button>
@@ -16,5 +57,4 @@
 
     </form>
 
-</div>
-{%endblock%}
+</div>-->

@@ -27,25 +27,32 @@
     </thead>
     <tbody>
         {% if flights %}
-            {% for flight in flights %}
-                <tr>
-                    <td><a href="{% url 'view_flight' flight.FLIGHTNUM %}">{{ flight.FLIGHTNUM }}</a></td>
-                    <td><a href="{% url 'view_city' flight.ORIGINCITYCODE.CITYCODE %}">{{ flight.ORIGINCITYCODE.CITYCODE }}</a></td>
-                    <td><a href="{% url 'view_city' flight.DESTCITYCODE.CITYCODE %}">{{ flight.DESTCITYCODE.CITYCODE }}</a></td>
-                    <td>{{ flight.DEPTIME }}</td>
-                    <td>{{ flight.ARRTIME }}</td>
-                    <td><a href="{% url 'view_pilot' flight.PILOTNUM.PILOTNUM %}">{{ flight.PILOTNUM.PILOTNUM }}</a></td>
-                    <td><a href="{% url 'view_plane' flight.PLANENUM.SERIALNUM %}">{{ flight.PLANENUM.SERIALNUM }}</a></td>
-                </tr>   
-            {%endfor%}
+        {% for flight in flights %}
+        <tr>
+            <td><a href="{% url 'view_flight' flight.FLIGHTNUM %}">{{ flight.FLIGHTNUM }}</a></td>
+            <td><a href="{% url 'view_city' flight.ORIGINCITYCODE.CITYCODE %}">{{ flight.ORIGINCITYCODE.CITYCODE }}</a>
+            </td>
+            <td><a href="{% url 'view_city' flight.DESTCITYCODE.CITYCODE %}">{{ flight.DESTCITYCODE.CITYCODE }}</a></td>
+            <td>{{ flight.DEPTIME }}</td>
+            <td>{{ flight.ARRTIME }}</td>
+            <td><a href="{% url 'view_staff_member' flight.PILOTNUM.EMPNUM.EMPNUM %}">{{ flight.PILOTNUM.PILOTNUM }}</a>
+            </td>
+            <td><a href="{% url 'view_plane' flight.PLANENUM.SERIALNUM %}">{{ flight.PLANENUM.SERIALNUM }}</a></td>
+        </tr>
+        {%endfor%}
         {% endif %}
     </tbody>
 </table>
+{% if user.is_superuser %}
+<a href="admin/auth/user/" class="btn btn-primary add-record-btn" style="max-width: max-content;">
+    Admin Management
+</a>
+{% endif %}
 
 <div class="col-md-6 offset-md-3"></div>
 {% else %}
 <h1>Login</h1>
-<br/>
+<br />
 <form method="POST" action="{% url 'home' %}">
     {% csrf_token %}
     <form>
@@ -55,7 +62,7 @@
         <div class="mb-3">
             <input type="password" class="form-control" name="password" placeholder="Password" required>
         </div>
-        <br/>
+        <br />
         <button type="submit" class="btn btn-primary">Login</button>
     </form>
 
@@ -67,11 +74,3 @@
 
 
 {% endblock %}
-
-<!--<td><a href="{% url 'view_flight' flight.FLIGHTNUM %}">{{ flight.FLIGHTNUM }}</a></td>
-                    <td><a href="{% url 'view_city' flight.ORIGINCITYCODE %}">{{ flight.ORIGINCITYCODE }}</a></td>
-                    <td><a href="{% url 'view_city' flight.DESTCITYCODE %}">{{ flight.DESTCITYCODE }}</a></td>
-                    <td>{{ flight.DEPTIME }}</td>
-                    <td>{{ flight.ARRTIME }}</td>
-                    <td><a href="{% url 'view_pilot' flight.PILOTNUM %}">{{ flight.PILOTNUM }}</a></td>
-                    <td><a href="{% url 'view_plane' flight.PLANENUM %}">{{ flight.PLANENUM }}</a></td>-->

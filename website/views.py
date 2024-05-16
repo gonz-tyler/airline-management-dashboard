@@ -10,7 +10,6 @@ import json
 #-- Render Home Page --#
 def home(request):
     flights = Flight.objects.all()
-    cities = City.objects.all()
     # check to see if logging in
     if request.method == 'POST':
         username = request.POST['username']
@@ -52,217 +51,690 @@ def register_user(request):
     return render(request, 'register.html', {'form':form})
 
 #-- Planes --#
-def view_planes(request):
-    if request.user.is_authenticated:
-        planes = Airplane.objects.all()
-        return render(request, 'planes.html', {'planes': planes})
+class PlaneClass:
+    def view_planes(request):
+        if request.user.is_authenticated:
+            planes = Airplane.objects.all()
+            return render(request, 'planes.html', {'planes': planes})
 
-def view_plane(request, serial_num):
-    if request.user.is_authenticated:
-        #look up plane
-        plane = Airplane.objects.get(SERIALNUM=serial_num)
-        return render(request, 'plane_details.html', {'plane':plane})
-    else:
-        messages.success(request, 'You must be logged in to view this page.')
-        return redirect('home')
-    
-def delete_plane(request, serial_num):
-    if request.user.is_authenticated:
-        delete_it = Airplane.objects.get(SERIALNUM=serial_num)
-        plane_number = delete_it.SERIALNUM
-        delete_it.delete()
-        messages.success(request, f"Plane {plane_number} Deleted Successfully")
-        flight_number = None
-        return redirect('home')
-    else:
-        messages.success(request, "You must be logged in to perform this action.")
-        return redirect('home')
-    
-def add_plane(request):
-    form = AddAirplaneForm(request.POST or None)
-    if request.user.is_authenticated:
-        if request.method == "POST":
+    def view_plane(request, serial_num):
+        if request.user.is_authenticated:
+            #look up plane
+            plane = Airplane.objects.get(SERIALNUM=serial_num)
+            return render(request, 'plane_details.html', {'plane':plane})
+        else:
+            messages.success(request, 'You must be logged in to view this page.')
+            return redirect('home')
+        
+    def delete_plane(request, serial_num):
+        if request.user.is_authenticated:
+            delete_it = Airplane.objects.get(SERIALNUM=serial_num)
+            plane_number = delete_it.SERIALNUM
+            delete_it.delete()
+            messages.success(request, f"Plane {plane_number} Deleted Successfully")
+            flight_number = None
+            return redirect('home')
+        else:
+            messages.success(request, "You must be logged in to perform this action.")
+            return redirect('home')
+        
+    def add_plane(request):
+        form = AddAirplaneForm(request.POST or None)
+        if request.user.is_authenticated:
+            if request.method == "POST":
+                if form.is_valid():
+                    add_plane = form.save()
+                    messages.success(request, f"Record Added...")
+                    return redirect("home")
+            return render(request, 'add_plane.html', {"form": form})
+        else:
+            messages.success(request, f"You must be logged in...")
+            return redirect("home")
+
+    def update_plane(request, serial_num):
+        if request.user.is_authenticated:
+            current_record = Airplane.objects.get(SERIALNUM=serial_num)
+            form = AddAirplaneForm(request.POST or None, instance=current_record)
+            form.fields['SERIALNUM'].widget = forms.HiddenInput()
             if form.is_valid():
-                add_plane = form.save()
-                messages.success(request, f"Record Added...")
-                return redirect("home")
-        return render(request, 'add_plane.html', {"form": form})
-    else:
-        messages.success(request, f"You must be logged in...")
-        return redirect("home")
+                form.save()
+                messages.success(request, "Record Has Been Updated!")
+                return redirect(reverse('view_plane', kwargs={'serial_num': serial_num}))
+            return render(request, 'update_plane.html', {'form':form})
+        else:
+            messages.success(request, "You Must Be Logged In...")
+            return redirect('home')
 
-def update_plane(request, serial_num):
-	if request.user.is_authenticated:
-		current_record = Airplane.objects.get(SERIALNUM=serial_num)
-		form = AddAirplaneForm(request.POST or None, instance=current_record)
-		if form.is_valid():
-			form.save()
-			messages.success(request, "Record Has Been Updated!")
-			return redirect('home')
-		return render(request, 'update_plane.html', {'form':form})
-	else:
-		messages.success(request, "You Must Be Logged In...")
-		return redirect('home')
+#-- Cities --# 
+class CityClass:  
+    def view_cities(request):
+        if request.user.is_authenticated:
+            cities = City.objects.all()
+            return render(request, 'cities.html', {'cities': cities})
 
-#-- Cities --#    
-def view_cities(request):
-    if request.user.is_authenticated:
-        cities = City.objects.all()
-        return render(request, 'cities.html', {'cities': cities})
+    def view_city(request, city_code):
+        if request.user.is_authenticated:
+            #look up city
+            city = City.objects.get(CITYCODE=city_code)
+            return render(request, 'city_details.html', {'city':city})
+        else:
+            messages.success(request, 'You must be logged in to view this page.')
+            return redirect('home')
+        
+    def delete_city(request, city_code):
+        if request.user.is_authenticated:
+            delete_it = City.objects.get(CITYCODE=city_code)
+            city_code = delete_it.CITYCODE
+            delete_it.delete()
+            messages.success(request, f"City {city_code} Deleted Successfully")
+            city_code = None
+            return redirect('home')
+        else:
+            messages.success(request, "You must be logged in to perform this action.")
+            return redirect('home')
 
-def view_city(request, city_code):
-    if request.user.is_authenticated:
-        #look up city
-        city = City.objects.get(CITYCODE=city_code)
-        return render(request, 'city_details.html', {'city':city})
-    else:
-        messages.success(request, 'You must be logged in to view this page.')
-        return redirect('home')
-    
-def delete_city(request, city_code):
-    if request.user.is_authenticated:
-        delete_it = City.objects.get(CITYCODE=city_code)
-        city_code = delete_it.CITYCODE
-        delete_it.delete()
-        messages.success(request, f"City {city_code} Deleted Successfully")
-        city_code = None
-        return redirect('home')
-    else:
-        messages.success(request, "You must be logged in to perform this action.")
-        return redirect('home')
-
-def add_city(request):
-    form = AddCityForm(request.POST or None)
-    if request.user.is_authenticated:
-        if request.method == "POST":
+    def add_city(request):
+        form = AddCityForm(request.POST or None)
+        if request.user.is_authenticated:
+            if request.method == "POST":
+                if form.is_valid():
+                    add_city = form.save()
+                    messages.success(request, f"Record Added...")
+                    return redirect("home")
+            return render(request, 'add_city.html', {"form": form})
+        else:
+            messages.success(request, f"You must be logged in...")
+            return redirect("home")
+        
+    def update_city(request, city_code):
+        if request.user.is_authenticated:
+            current_record = City.objects.get(CITYCODE=city_code)
+            form = AddCityForm(request.POST or None, instance=current_record)
+            form.fields['CITYCODE'].widget = forms.HiddenInput()
             if form.is_valid():
-                add_city = form.save()
-                messages.success(request, f"Record Added...")
-                return redirect("home")
-        return render(request, 'add_city.html', {"form": form})
-    else:
-        messages.success(request, f"You must be logged in...")
-        return redirect("home")
-    
-def update_city(request, city_code):
-	if request.user.is_authenticated:
-		current_record = City.objects.get(CITYCODE=city_code)
-		form = AddCityForm(request.POST or None, instance=current_record)
-		if form.is_valid():
-			form.save()
-			messages.success(request, "Record Has Been Updated!")
-			return redirect('home')
-		return render(request, 'update_city.html', {'form':form})
-	else:
-		messages.success(request, "You Must Be Logged In...")
-		return redirect('home')
-
-#-- Flight Crews --#    
-def view_crews(request):
-    if request.user.is_authenticated:
-        crews = FlightCrew.objects.all()
-        return render(request, 'crews.html', {'crews': crews})
-
-def view_crew(request, flight_num, employee_num):
-    if request.user.is_authenticated:
-        #look up city
-        crew = FlightCrew.objects.get(FLIGHTNUM=flight_num, EMPNUM=employee_num)
-        return render(request, 'crew_details.html', {'crew':crew})
-    else:
-        messages.success(request, 'You must be logged in to view this page.')
-        return redirect('home')
-    
-def delete_crew(request, flight_num, employee_num):
-    if request.user.is_authenticated:
-        # Get the FlightCrew object with the given flight number and employee number
-        delete_it = FlightCrew.objects.get(FLIGHTNUM=flight_num, EMPNUM=employee_num)
-        # Delete the FlightCrew object
-        delete_it.delete()
-        # Add a success message
-        #messages.success(request, f"Flight crew with flight number {flight_number} and employee number {employee_number} deleted successfully.")
-        messages.success(request, "Crew Member Removed...")
-        return redirect(reverse('view_flight', kwargs={'flight_num': flight_num}))
-    else:
-        # Add a message for unauthenticated users
-        messages.error(request, "You must be logged in to perform this action.")
-        return redirect('home')
-
-def add_crew(request, flight_num):
-    if request.user.is_authenticated:
-        flight = Flight.objects.get(FLIGHTNUM=flight_num)
-        form = AddFlightCrewForm(request.POST or None, initial={'FLIGHTNUM': flight})
-
-        if request.method == "POST":
-            if form.is_valid():
-                crew = form.save(commit=False)
-                crew.FLIGHTNUM = flight
-                crew.save()
-                messages.success(request, "Crew Member Added...")
-                #return redirect("url 'view_flight' flight_num")
-                return redirect(reverse('view_flight', kwargs={'flight_num': flight_num}))
-        return render(request, 'add_crew.html', {"form": form})
-    else:
-        messages.success(request, f"You must be logged in...")
-        return redirect("home")
-
-    
+                form.save()
+                messages.success(request, "Record Has Been Updated!")
+                return redirect(reverse('view_city', kwargs={'city_code': city_code}))
+            return render(request, 'update_city.html', {'form':form})
+        else:
+            messages.success(request, "You Must Be Logged In...")
+            return redirect('home')
 
 #-- Flights --#
-def view_flights(request):
-    if request.user.is_authenticated:
-        flights = Flight.objects.all()
-        return render(request, 'home.html', {'flights': flights})
+class FlightClass:
+    def view_flights(request):
+        if request.user.is_authenticated:
+            flights = Flight.objects.all()
+            return render(request, 'home.html', {'flights': flights})
 
-def view_flight(request, flight_num):
+    def view_flight(request, flight_num):
+        if request.user.is_authenticated:
+            #look up flight
+            flight = Flight.objects.get(FLIGHTNUM=flight_num)
+            passengers = PassengerBooking.objects.filter(FLIGHTNUM=flight_num)
+            crew = FlightCrew.objects.filter(FLIGHTNUM=flight_num)
+            intermediate_cities = IntermediateCity.objects.filter(FLIGHTNUM=flight_num)
+            return render(request, 'flight_details.html', {'flight':flight, 'passengers': passengers, 'crew': crew, 'intermediate_cities': intermediate_cities})
+        else:
+            messages.success(request, 'You must be logged in to view this page.')
+            return redirect('home')
+        
+    def delete_flight(request, flight_num):
+        if request.user.is_authenticated:
+            delete_it = Flight.objects.get(FLIGHTNUM=flight_num)
+            flight_number = delete_it.FLIGHTNUM
+            delete_it.delete()
+            messages.success(request, f"Flight {flight_number} Deleted Successfully")
+            flight_number = None
+            return redirect('home')
+        else:
+            messages.success(request, "You must be logged in to perform this action.")
+            return redirect('home')
+
+    def add_flight(request):
+        form = AddFlightForm(request.POST or None)
+        if request.user.is_authenticated:
+            if request.method == "POST":
+                if form.is_valid():
+                    add_flight = form.save()
+                    messages.success(request, f"Record Added...")
+                    return redirect("home")
+            return render(request, 'add_flight.html', {"form": form})
+        else:
+            messages.success(request, f"You must be logged in...")
+            return redirect("home")
+        
+    def update_flight(request, flight_num):
+        if request.user.is_authenticated:
+            current_record = Flight.objects.get(FLIGHTNUM=flight_num)
+            form = AddFlightForm(request.POST or None, instance=current_record)
+            form.fields['FLIGHTNUM'].widget = forms.HiddenInput()
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Record Has Been Updated!")
+                return redirect(reverse('view_flight', kwargs={'flight_num': flight_num}))
+            return render(request, 'update_flight.html', {'form':form, "flight": current_record})
+        else:
+            messages.success(request, "You Must Be Logged In...")
+            return redirect('home')
+        
+    def delete_crew(request, flight_num, employee_num):
+        if request.user.is_authenticated:
+            # Get the FlightCrew object with the given flight number and employee number
+            delete_it = FlightCrew.objects.get(FLIGHTNUM=flight_num, EMPNUM=employee_num)
+            # Delete the FlightCrew object
+            delete_it.delete()
+            # Add a success message
+            #messages.success(request, f"Flight crew with flight number {flight_number} and employee number {employee_number} deleted successfully.")
+            messages.success(request, "Crew Member Removed...")
+            return redirect(reverse('view_flight', kwargs={'flight_num': flight_num}))
+        else:
+            # Add a message for unauthenticated users
+            messages.error(request, "You must be logged in to perform this action.")
+            return redirect('home')
+
+    def add_crew(request, flight_num):
+        if request.user.is_authenticated:
+            flight = Flight.objects.get(FLIGHTNUM=flight_num)
+            form = AddFlightCrewForm(request.POST or None, initial={'FLIGHTNUM': flight})
+            form.fields['FLIGHTNUM'].widget = forms.HiddenInput()
+            if request.method == "POST":
+                if form.is_valid():
+                    crew = form.save(commit=False)
+                    crew.FLIGHTNUM = flight
+                    crew.save()
+                    messages.success(request, "Crew Member Added...")
+                    #return redirect("url 'view_flight' flight_num")
+                    return redirect(reverse('view_flight', kwargs={'flight_num': flight_num}))
+            return render(request, 'add_crew.html', {"form": form, "flight": flight})
+        else:
+            messages.success(request, f"You must be logged in...")
+            return redirect("home")
+        
+    def delete_passenger_booking(request, flight_num, passenger_num):
+        if request.user.is_authenticated:
+            delete_it = PassengerBooking.objects.get(PASSENGERNUM=passenger_num, FLIGHTNUM=flight_num)
+            delete_it.delete()
+            # Add a success message
+            messages.success(request, "Passenger Removed...")
+            return redirect(reverse('view_flight', kwargs={'flight_num': flight_num}))
+        else:
+            messages.success(request, 'You must be logged in to perform this action.')
+            return redirect('home')
+
+    def add_passenger_booking(request, flight_num):
+        if request.user.is_authenticated:
+            flight = Flight.objects.get(FLIGHTNUM=flight_num)
+            form = AddPassengerBookingForm(request.POST or None, initial={'FLIGHTNUM': flight})
+            form.fields['FLIGHTNUM'].widget = forms.HiddenInput()
+            if request.method == "POST":
+                if form.is_valid():
+                    passenger_booking = form.save(commit=False)
+                    passenger_booking.FLIGHTNUM = flight
+                    passenger_booking.save()
+                    messages.success(request, "Passenger Added...")
+                    return redirect(reverse('view_flight', kwargs={'flight_num': flight_num}))
+            return render(request, 'add_passenger_booking.html', {"form": form, "flight": flight})
+        else:
+            messages.success(request, f"You must be logged in...")
+            return redirect("home")
+
+    def delete_intermediate_city(request, stretch_num):
+        if request.user.is_authenticated:
+            delete_it = IntermediateCity.objects.get(STRETCHNUM=stretch_num)
+            flight_num = delete_it.FLIGHTNUM.FLIGHTNUM
+            delete_it.delete()
+            messages.success(request, "Intermediate City Deleted...")
+            return redirect(reverse('view_flight', kwargs={'flight_num': flight_num}))
+        else:
+            messages.success(request, "You must be logged in to perform this action.")
+            return redirect('home')
+
+    def add_intermediate_city(request, flight_num):
+        if request.user.is_authenticated:
+            flight = Flight.objects.get(FLIGHTNUM=flight_num)
+            form = AddIntermediateCityForm(request.POST or None, initial={'FLIGHTNUM': flight})
+            form.fields['FLIGHTNUM'].widget = forms.HiddenInput()
+            if request.method == "POST":
+                if form.is_valid():
+                    intermediate_city = form.save(commit=False)
+                    intermediate_city.FLIGHTNUM = flight
+                    intermediate_city.save()
+                    messages.success(request, "Intermediate City Added...")
+                    return redirect(reverse('view_flight', kwargs={'flight_num': flight_num}))
+            return render(request, 'add_intermediate_city.html', {"form": form, "flight": flight})
+        else:
+            messages.success(request, f"You must be logged in...")
+            return redirect("home")
+
+#-- Passengers --#
+class PassengerClass: 
+    def view_passengers(request):
+        if request.user.is_authenticated:
+            passengers = Passenger.objects.all()
+            return render(request, 'passengers.html', {'passengers': passengers})
+
+    def view_passenger(request, passenger_num):
+        if request.user.is_authenticated:
+            passenger = Passenger.objects.get(PASSENGERNUM=passenger_num)
+            bookings = PassengerBooking.objects.filter(PASSENGERNUM=passenger_num)
+            addresses = PassengerAddress.objects.filter(PASSENGERNUM=passenger_num)
+            phones = PassengerPhone.objects.filter(PASSENGERNUM=passenger_num)
+            return render(request, 'passenger_details.html', {'passenger': passenger, 'bookings': bookings, 'addresses': addresses, 'phones': phones})
+        else:
+            messages.success(request, 'You must be logged in to view this page.')
+            return redirect('home')
+        
+    def delete_passenger(request, passenger_num):
+        if request.user.is_authenticated:
+            delete_it = Passenger.objects.get(PASSENGERNUM=passenger_num)
+            delete_it.delete()
+            messages.success(request, f"Passenger with passenger number {passenger_num} Deleted Successfully")
+            return redirect('home')
+        else:
+            messages.success(request, "You must be logged in to perform this action.")
+            return redirect('home')
+
+    def add_passenger(request):
+        if request.user.is_authenticated:
+            form = AddPassengerForm(request.POST or None)
+            AddressFormSet = formset_factory(AddPassengerAddressForm)
+            PhoneFormSet = formset_factory(AddPassengerPhoneForm)
+            address_forms = AddressFormSet(request.POST or None, prefix='addresses')
+            phone_forms = PhoneFormSet(request.POST or None, prefix='phones')
+            if request.method == "POST":
+                #data = json.loads(request.body)
+                print(request.body)
+
+                # Extracting data from POST request
+                passenger_num = request.POST.get('PASSENGERNUM')
+                name = request.POST.get('NAME')
+                surname = request.POST.get('SURNAME')
+
+                # Extracting addresses
+                addresses = request.POST.getlist('addresses-0-ADDRESSDETAILS')
+
+                # Extracting phones
+                phones = request.POST.getlist('phones-0-PHONE')
+
+                # Creating and saving Passenger object
+                passenger = Passenger.objects.create(PASSENGERNUM=passenger_num, NAME=name, SURNAME=surname)
+
+                # Creating and saving PassengerAddress objects
+                for address in addresses:
+                    PassengerAddress.objects.create(PASSENGERNUM=passenger, ADDRESSDETAILS=address)
+
+                # Creating and saving PassengerPhone objects
+                for phone in phones:
+                    PassengerPhone.objects.create(PASSENGERNUM=passenger, PHONE=phone)
+
+                messages.success(request, "Passenger record added successfully.")
+                return redirect("home")
+
+        else:
+            messages.error(request, "You must be logged in to add a passenger.")
+            return redirect("home")
+        return render(request, 'add_passenger.html', {"form": form, "address_formset": address_forms, "phone_formset": phone_forms})
+
+    def update_passenger(request, passenger_num):
+        if request.user.is_authenticated:
+            current_record = Passenger.objects.get(PASSENGERNUM=passenger_num)
+            form = AddPassengerForm(request.POST or None, instance=current_record)
+            form.fields['PASSENGERNUM'].widget = forms.HiddenInput()
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Record Has Been Updated!")
+                return redirect(reverse('view_passenger', kwargs={'passenger_num': passenger_num}))
+            return render(request, 'update_passenger.html', {'form':form})
+        else:
+            messages.success(request, "You Must Be Logged In...")
+            return redirect('home')
+        
+    def delete_passenger_address(request, passenger_num, address):
+        if request.user.is_authenticated:
+            delete_it = PassengerAddress.objects.get(PASSENGERNUM=passenger_num, ADDRESSDETAILS=address)
+            delete_it.delete()
+            # Add a success message
+            messages.success(request, "Address Removed...")
+            return redirect(reverse('view_passenger', kwargs={'passenger_num': passenger_num}))
+        else:
+            # Add a message for unauthenticated users
+            messages.error(request, "You must be logged in to perform this action.")
+            return redirect('home')
+
+    def add_passenger_address(request, passenger_num):
+        if request.user.is_authenticated:
+            passenger = Passenger.objects.get(PASSENGERNUM=passenger_num)
+            form = AddPassengerAddressForm(request.POST or None, initial={'PASSENGERNUM': passenger})
+            if request.method == "POST":
+                if form.is_valid():
+                    passenger_address = form.save(commit=False)
+                    passenger_address.PASSENGERNUM = passenger
+                    # Check for duplicates
+                    if PassengerAddress.objects.filter(PASSENGERNUM=passenger, ADDRESSDETAILS=passenger_address.ADDRESSDETAILS).exists():
+                        messages.error(request, "The address for this passenger already exists.")
+                        return render(request, 'add_passenger_address.html', {"form": form})
+                    passenger_address.save()
+                    messages.success(request, f"Address Added...")
+                    return redirect(reverse('view_passenger', kwargs={'passenger_num': passenger.PASSENGERNUM}))
+            return render(request, 'add_passenger_address.html', {"form": form})
+        else:
+            messages.success(request, f"You must be logged in...")
+            return redirect("home")
+    
+    def delete_passenger_phone(request, phone):
+        if request.user.is_authenticated:
+            delete_it = PassengerPhone.objects.get(PHONE=phone)
+            passenger_num = delete_it.PASSENGERNUM.PASSENGERNUM
+            delete_it.delete()
+            messages.success(request, "Phone Removed...")
+            return redirect(reverse('view_passenger', kwargs={'passenger_num': passenger_num}))
+        else:
+            messages.success(request, "You must be logged in to perform this action.")
+            return redirect('home')
+
+    def add_passenger_phone(request, passenger_num):
+        if request.user.is_authenticated:
+            passenger = Passenger.objects.get(PASSENGERNUM=passenger_num)
+            form = AddPassengerPhoneForm(request.POST or None, initial={'PASSENGERNUM': passenger})
+            if request.method == "POST":
+                if form.is_valid():
+                    passenger_phone = form.save(commit=False)
+                    passenger_phone.PASSENGERNUM = passenger
+                    valid_chars = set('0123456789-+')
+                    for char in passenger_phone.PHONE:
+                        if char not in valid_chars:
+                            messages.error(request, "Invalid Phone Number, must only include 0-9, -, +")
+                            form.data = form.data.copy()  # Make the form data mutable
+                            form.data['PHONE'] = ""
+                            return render(request, 'add_passenger_phone.html', {"form": form})
+                    passenger_phone.save()
+                    messages.success(request, f"Phone Added...")
+                    return redirect(reverse('view_passenger', kwargs={'passenger_num': passenger.PASSENGERNUM}))
+            return render(request, 'add_passenger_phone.html', {"form": form})
+        else:
+            messages.success(request, f"You must be logged in...")
+            return redirect("home")
+
+#-- Pilots --#  
+class PilotClass:  
+    def view_pilots(request):
+        if request.user.is_authenticated:
+            pilots = Pilot.objects.all()
+            return render(request, 'pilots.html', {'pilots': pilots})
+
+    def view_pilot(request, pilot_num):
+        if request.user.is_authenticated:
+            # Look up pilot
+            pilot = Pilot.objects.get(PILOTNUM=pilot_num)
+            # Get all type ratings for the pilot
+            typeratings = PilotTypeRating.objects.filter(PILOTNUM=pilot)
+            addresses = StaffAddress.objects.filter(EMPNUM=pilot.EMPNUM)
+            phones = StaffPhone.objects.filter(EMPNUM=pilot.EMPNUM)
+            flights = Flight.objects.filter(PILOTNUM=pilot_num)
+            return render(request, 'pilot_details.html', {'pilot': pilot, 'typeratings': typeratings, 'addresses': addresses, 'phones': phones, 'flights': flights})
+        else:
+            messages.success(request, 'You must be logged in to view this page.')
+            return redirect('home')
+        
+    def delete_pilot(request, pilot_num):
+        if request.user.is_authenticated:
+            delete_it = Pilot.objects.get(PILOTNUM=pilot_num)
+            delete_it.delete()
+            messages.success(request, f"Pilot with pilot number {pilot_num} Deleted Successfully")
+            return redirect('home')
+        else:
+            messages.success(request, "You must be logged in to perform this action.")
+            return redirect('home')
+
+    def add_pilot(request):
+        form = AddPilotForm(request.POST or None)
+        if request.user.is_authenticated:
+            if request.method == "POST":
+                if form.is_valid():
+                    add_pilot = form.save()
+                    messages.success(request, f"Record Added...")
+                    return redirect("home")
+            return render(request, 'add_pilot.html', {"form": form})
+        else:
+            messages.success(request, f"You must be logged in...")
+            return redirect("home")
+        
+    def update_pilot(request, pilot_num):
+        if request.user.is_authenticated:
+            current_record = Pilot.objects.get(PILOTNUM=pilot_num)
+            form = AddPilotForm(request.POST or None, instance=current_record)
+            form.fields['PILOTNUM'].widget = forms.HiddenInput()
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Record Has Been Updated!")
+                return redirect(reverse('view_pilot', kwargs={'pilot_num': pilot_num}))
+            return render(request, 'update_pilot.html', {'form':form})
+        else:
+            messages.success(request, "You Must Be Logged In...")
+            return redirect('home')
+
+    def delete_pilot_typerating(request, pilot_num, typerating):
+        if request.user.is_authenticated:
+            delete_it = PilotTypeRating.objects.get(PILOTNUM=pilot_num, TYPERATING=typerating)
+            employee_num = delete_it.PILOTNUM.EMPNUM.EMPNUM
+            delete_it.delete()
+            # Add a success message
+            messages.success(request, f"Pilot type rating deleted...")
+            return redirect(reverse('view_staff_member', kwargs={'employee_num': employee_num}))
+        else:
+            messages.success(request, 'You must be logged in to perform this action.')
+            return redirect('home')
+
+    def add_pilot_typerating(request, employee_num):
+        if request.user.is_authenticated:
+            pilot = Pilot.objects.get(EMPNUM=employee_num)
+            form = AddPilotTypeRatingForm(request.POST or None, initial={'PILOTNUM': pilot.PILOTNUM})
+            if request.method == "POST":
+                if form.is_valid():
+                    typerating = form.save(commit=False)
+                    typerating.PILOTNUM = pilot
+                    typerating.save()
+                    messages.success(request, f"Typerating Added...")
+                    return redirect(reverse('view_staff_member', kwargs={'employee_num': employee_num}))
+            return render(request, 'add_pilot_typerating.html', {"form": form})
+        else:
+            messages.success(request, f"You must be logged in...")
+            return redirect("home")
+
+#-- Staff --#    
+class StaffClass:
+    def view_staff(request):
+        if request.user.is_authenticated:
+            staff = Staff.objects.all()
+            return render(request, 'staff.html', {'staff': staff})
+
+    def view_staff_member(request, employee_num):
+        if request.user.is_authenticated:
+            #look up staff_member
+            staff_member = Staff.objects.get(EMPNUM=employee_num)
+            addresses = StaffAddress.objects.filter(EMPNUM=employee_num)
+            phones = StaffPhone.objects.filter(EMPNUM=employee_num)
+            if staff_member.TYPE == 'Crew':
+                flights = Flight.objects.filter(flightcrew__EMPNUM=employee_num)
+                return render(request, 'staff_details.html', {'staff_member': staff_member, 'addresses': addresses, 'phones': phones, 'flights': flights})
+            else:
+                pilot = Pilot.objects.get(EMPNUM=employee_num)
+                # Use the pilotnum to filter the Flight objects
+                flights = Flight.objects.filter(PILOTNUM=pilot.PILOTNUM)
+                typeratings = PilotTypeRating.objects.filter(PILOTNUM=pilot)
+                return render(request, 'staff_details.html', {'staff_member': staff_member, 'addresses': addresses, 'phones': phones, 'flights': flights, 'typeratings': typeratings, 'pilot': pilot})
+        else:
+            messages.success(request, 'You must be logged in to view this page.')
+            return redirect('home')
+        
+    def delete_staff_member(request, employee_num):
+        if request.user.is_authenticated:
+            delete_it = Staff.objects.get(EMPNUM=employee_num)
+            delete_it.delete()
+            messages.success(request, f"Staff member with employee number {employee_num} Deleted Successfully")
+            return redirect('home')
+        else:
+            messages.success(request, "You must be logged in to perform this action.")
+            return redirect('home')        
+
+    def add_staff_member(request):
+        if request.user.is_authenticated:
+            form = AddStaffForm(request.POST or None)
+            AddressFormSet = formset_factory(AddStaffAddressForm)
+            PhoneFormSet = formset_factory(AddStaffPhoneForm)
+            address_forms = AddressFormSet(request.POST or None, prefix='addresses')
+            phone_forms = PhoneFormSet(request.POST or None, prefix='phones')
+            
+            if request.method == "POST":
+                if form.is_valid() and address_forms.is_valid() and phone_forms.is_valid():
+                    # Extracting data from POST request
+                    employee_num = form.cleaned_data['EMPNUM']
+                    name = form.cleaned_data['NAME']
+                    surname = form.cleaned_data['SURNAME']
+                    type = form.cleaned_data['TYPE']
+                    pilot_num = form.cleaned_data['pilotnum']
+                    salary = form.cleaned_data['SALARY']
+                    
+                    # Extracting addresses
+                    addresses = request.POST.getlist('addresses-0-ADDRESSDETAILS')
+                    
+                    # Extracting phones
+                    phones = request.POST.getlist('phones-0-PHONE')
+                    
+                    # Check for duplicate phone numbers
+                    existing_phones = StaffPhone.objects.filter(PHONE__in=phones).values_list('PHONE', flat=True)
+                    if existing_phones:
+                        messages.error(request, {'PHONE': 'Phone number(s) {} already exist.'.format(', '.join(existing_phones))})
+                    else:
+                        # Creating and saving Staff object
+                        staff_member = Staff.objects.create(EMPNUM=employee_num, NAME=name, SURNAME=surname, TYPE=type, SALARY=salary)
+                        if type == 'Pilot':
+                            Pilot.objects.create(EMPNUM=staff_member, PILOTNUM=pilot_num)
+
+                        # Creating and saving StaffAddress objects
+                        for address in addresses:
+                            StaffAddress.objects.create(EMPNUM=staff_member, ADDRESSDETAILS=address)
+
+                        # Creating and saving StaffPhone objects
+                        for phone in phones:
+                            StaffPhone.objects.create(EMPNUM=staff_member, PHONE=phone)
+
+                        messages.success(request, "Staff record added successfully.")
+                        return redirect("view_staff")
+                else:
+                    messages.error(request, "Please correct the errors below.")
+
+        else:
+            messages.error(request, "You must be logged in to add a passenger.")
+            return redirect("home")
+        return render(request, 'add_staff_member.html', {"form": form, "address_formset": address_forms, "phone_formset": phone_forms})
+
+    def update_staff_member(request, employee_num):
+        if request.user.is_authenticated:
+            current_record = Staff.objects.get(EMPNUM=employee_num)
+            if current_record.TYPE == "Pilot":
+                pilot_num = Pilot.objects.get(EMPNUM=employee_num).PILOTNUM
+                form = AddStaffForm(request.POST or None, instance=current_record, initial={'pilotnum': pilot_num})
+                form.fields['EMPNUM'].widget = forms.HiddenInput()
+                form.fields['TYPE'].widget = forms.HiddenInput()
+                form.fields['pilotnum'].widget = forms.HiddenInput()
+            else:
+                form = AddStaffForm(request.POST or None, instance=current_record)
+                form.fields['pilotnum'].widget = forms.HiddenInput()
+                form.fields['EMPNUM'].widget = forms.HiddenInput()
+                form.fields['TYPE'].widget = forms.HiddenInput()
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Record Has Been Updated!")
+                return redirect(reverse('view_staff_member', kwargs={'employee_num': employee_num}))
+            return render(request, 'update_staff_member.html', {'form':form, 'employee_num': employee_num})
+        else:
+            messages.success(request, "You Must Be Logged In...")
+            return redirect('home')
+    
+    def delete_staff_address(request, employee_num, address):
+        if request.user.is_authenticated:
+            # Get the FlightCrew object with the given flight number and employee number
+            delete_it = StaffAddress.objects.get(EMPNUM=employee_num, ADDRESSDETAILS=address)
+            # Delete the FlightCrew object
+            delete_it.delete()
+            messages.success(request, "Address Removed...")
+            return redirect(reverse('view_staff_member', kwargs={'employee_num': employee_num}))
+        else:
+            # Add a message for unauthenticated users
+            messages.error(request, "You must be logged in to perform this action.")
+            return redirect('home')
+
+    def add_staff_address(request, employee_num):
+        if request.user.is_authenticated:
+            employee = Staff.objects.get(EMPNUM=employee_num)
+            form = AddStaffAddressForm(request.POST or None, initial={'EMPNUM': employee})
+            if request.method == "POST":
+                if form.is_valid():
+                    staff_address = form.save(commit=False)
+                    staff_address.EMPNUM = employee
+                    # Check for duplicates
+                    if StaffAddress.objects.filter(EMPNUM=employee, ADDRESSDETAILS=staff_address.ADDRESSDETAILS).exists():
+                        messages.error(request, "The address for this staff member already exists.")
+                        return render(request, 'add_staff_address.html', {"form": form})
+                    staff_address.save()
+                    messages.success(request, f"Address Added...")
+                    return redirect(reverse('view_staff_member', kwargs={'employee_num': employee_num}))
+            return render(request, 'add_staff_address.html', {"form": form})
+        else:
+            messages.success(request, f"You must be logged in...")
+            return redirect("home")
+    
+    def delete_staff_phone(request, phone):
+        if request.user.is_authenticated:
+            delete_it = StaffPhone.objects.get(PHONE=phone)
+            employee_num = delete_it.EMPNUM.EMPNUM
+            delete_it.delete()
+            messages.success(request, "Phone Removed...")
+            return redirect(reverse('view_staff_member', kwargs={'employee_num': employee_num}))
+        else:
+            messages.success(request, "You must be logged in to perform this action.")
+            return redirect('home')
+
+    def add_staff_phone(request, employee_num):
+        if request.user.is_authenticated:
+            employee = Staff.objects.get(EMPNUM=employee_num)
+            form = AddStaffPhoneForm(request.POST or None, initial={'EMPNUM': employee})
+            if request.method == "POST":
+                if form.is_valid():
+                    staff_phone = form.save(commit=False)
+                    staff_phone.EMPNUM = employee
+                    valid_chars = set('0123456789-+')
+                    for char in staff_phone.PHONE:
+                        if char not in valid_chars:
+                            messages.error(request, "Invalid Phone Number, must only include 0-9, -, +")
+                            form.data = form.data.copy()  # Make the form data mutable
+                            form.data['PHONE'] = ""
+                            return render(request, 'add_staff_phone.html', {"form": form})
+                    staff_phone.save()
+                    messages.success(request, f"Phone Added...")
+                    return redirect(reverse('view_staff_member', kwargs={'employee_num': employee_num}))
+            return render(request, 'add_staff_phone.html', {"form": form})
+        else:
+            messages.success(request, f"You must be logged in...")
+            return redirect("home")
+
+#-- Stretch --#    
+def view_stretches(request):
     if request.user.is_authenticated:
-        #look up flight
-        flight = Flight.objects.get(FLIGHTNUM=flight_num)
-        passengers = PassengerBooking.objects.filter(FLIGHTNUM=flight_num)
-        crew = FlightCrew.objects.filter(FLIGHTNUM=flight_num)
-        stretches = Stretch.objects.filter(FLIGHTNUM=flight_num)
-        return render(request, 'flight_details.html', {'flight':flight, 'passengers': passengers, 'crew': crew, 'stretches': stretches})
+        intermediate_cities = IntermediateCity.objects.all()
+        return render(request, 'stretches.html', {'intermediate_cities': intermediate_cities})
+
+def view_stretch(request, stretch_num):
+    if request.user.is_authenticated:
+        #look up stretch
+        intermediate_city = IntermediateCity.objects.get(STRETCHNUM=stretch_num)
+        return render(request, 'stretch_details.html', {'intermediate_city':intermediate_city})
     else:
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')
     
-def delete_flight(request, flight_num):
-    if request.user.is_authenticated:
-        delete_it = Flight.objects.get(FLIGHTNUM=flight_num)
-        flight_number = delete_it.FLIGHTNUM
-        delete_it.delete()
-        messages.success(request, f"Flight {flight_number} Deleted Successfully")
-        flight_number = None
-        return redirect('home')
-    else:
-        messages.success(request, "You must be logged in to perform this action.")
-        return redirect('home')
-
-def add_flight(request):
-    form = AddFlightForm(request.POST or None)
-    if request.user.is_authenticated:
-        if request.method == "POST":
-            if form.is_valid():
-                add_flight = form.save()
-                messages.success(request, f"Record Added...")
-                return redirect("home")
-        return render(request, 'add_flight.html', {"form": form})
-    else:
-        messages.success(request, f"You must be logged in...")
-        return redirect("home")
-    
-def update_flight(request, flight_num):
-	if request.user.is_authenticated:
-		current_record = Flight.objects.get(FLIGHTNUM=flight_num)
-		form = AddFlightForm(request.POST or None, instance=current_record)
-		if form.is_valid():
-			form.save()
-			messages.success(request, "Record Has Been Updated!")
-			return redirect('home')
-		return render(request, 'update_flight.html', {'form':form})
-	else:
-		messages.success(request, "You Must Be Logged In...")
-		return redirect('home')
-
 #-- Passenger Addresses --#    
 def view_passenger_addresses(request):
     if request.user.is_authenticated:
@@ -277,34 +749,6 @@ def view_passenger_address(request, passenger_num, passenger_address):
     else:
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')
-    
-def delete_passenger_address(request, passenger_num, address):
-    if request.user.is_authenticated:
-        delete_it = PassengerAddress.objects.get(PASSENGERNUM=passenger_num, ADDRESSDETAILS=address)
-        delete_it.delete()
-        # Add a success message
-        messages.success(request, "Address Removed...")
-        return redirect(reverse('view_passenger', kwargs={'passenger_num': passenger_num}))
-    else:
-        # Add a message for unauthenticated users
-        messages.error(request, "You must be logged in to perform this action.")
-        return redirect('home')
-
-def add_passenger_address(request, passenger_num):
-    if request.user.is_authenticated:
-        passenger = Passenger.objects.get(PASSENGERNUM=passenger_num)
-        form = AddPassengerAddressForm(request.POST or None, initial={'PASSENGERNUM': passenger})
-        if request.method == "POST":
-            if form.is_valid():
-                passenger_address = form.save(commit=False)
-                passenger_address.PASSENGERNUM = passenger
-                passenger_address.save()
-                messages.success(request, f"Address Added...")
-                return redirect(reverse('view_passenger', kwargs={'passenger_num': passenger.PASSENGERNUM}))
-        return render(request, 'add_passenger_address.html', {"form": form})
-    else:
-        messages.success(request, f"You must be logged in...")
-        return redirect("home")
 
 #-- Passenger Bookings --#    
 def view_passenger_bookings(request):
@@ -320,34 +764,6 @@ def view_passenger_booking(request, passenger_num, flight_num):
     else:
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')
-    
-def delete_passenger_booking(request, flight_num, passenger_num):
-    if request.user.is_authenticated:
-        delete_it = PassengerBooking.objects.get(PASSENGERNUM=passenger_num, FLIGHTNUM=flight_num)
-        delete_it.delete()
-        # Add a success message
-        messages.success(request, "Passenger Removed...")
-        return redirect(reverse('view_flight', kwargs={'flight_num': flight_num}))
-    else:
-        messages.success(request, 'You must be logged in to perform this action.')
-        return redirect('home')
-
-def add_passenger_booking(request, flight_num):
-    if request.user.is_authenticated:
-        flight = Flight.objects.get(FLIGHTNUM=flight_num)
-        form = AddPassengerBookingForm(request.POST or None, initial={'FLIGHTNUM': flight})
-
-        if request.method == "POST":
-            if form.is_valid():
-                passenger_booking = form.save(commit=False)
-                passenger_booking.FLIGHTNUM = flight
-                passenger_booking.save()
-                messages.success(request, "Passenger Added...")
-                return redirect(reverse('view_flight', kwargs={'flight_num': flight_num}))
-        return render(request, 'add_passenger_booking.html', {"form": form})
-    else:
-        messages.success(request, f"You must be logged in...")
-        return redirect("home")
 
 #-- Passenger Phones --#    
 def view_passenger_phones(request):
@@ -364,169 +780,6 @@ def view_passenger_phone(request, phone):
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')
     
-def delete_passenger_phone(request, phone):
-    if request.user.is_authenticated:
-        delete_it = PassengerPhone.objects.get(PHONE=phone)
-        passenger_num = delete_it.PASSENGERNUM.PASSENGERNUM
-        delete_it.delete()
-        messages.success(request, "Phone Removed...")
-        return redirect(reverse('view_passenger', kwargs={'passenger_num': passenger_num}))
-    else:
-        messages.success(request, "You must be logged in to perform this action.")
-        return redirect('home')
-
-def add_passenger_phone(request, passenger_num):
-    if request.user.is_authenticated:
-        passenger = Passenger.objects.get(PASSENGERNUM=passenger_num)
-        form = AddPassengerPhoneForm(request.POST or None, initial={'PASSENGERNUM': passenger})
-        if request.method == "POST":
-            if form.is_valid():
-                passenger_phone = form.save(commit=False)
-                passenger_phone.PASSENGERNUM = passenger
-                passenger_phone.save()
-                messages.success(request, f"Phone Added...")
-                return redirect(reverse('view_passenger', kwargs={'passenger_num': passenger.PASSENGERNUM}))
-        return render(request, 'add_passenger_phone.html', {"form": form})
-    else:
-        messages.success(request, f"You must be logged in...")
-        return redirect("home")
-
-#-- Passengers --#    
-def view_passengers(request):
-    if request.user.is_authenticated:
-        passengers = Passenger.objects.all()
-        return render(request, 'passengers.html', {'passengers': passengers})
-
-def view_passenger(request, passenger_num):
-    if request.user.is_authenticated:
-        passenger = Passenger.objects.get(PASSENGERNUM=passenger_num)
-        bookings = PassengerBooking.objects.filter(PASSENGERNUM=passenger_num)
-        addresses = PassengerAddress.objects.filter(PASSENGERNUM=passenger_num)
-        phones = PassengerPhone.objects.filter(PASSENGERNUM=passenger_num)
-        return render(request, 'passenger_details.html', {'passenger': passenger, 'bookings': bookings, 'addresses': addresses, 'phones': phones})
-    else:
-        messages.success(request, 'You must be logged in to view this page.')
-        return redirect('home')
-    
-def delete_passenger(request, passenger_num):
-    if request.user.is_authenticated:
-        delete_it = Passenger.objects.get(PASSENGERNUM=passenger_num)
-        delete_it.delete()
-        messages.success(request, f"Passenger with passenger number {passenger_num} Deleted Successfully")
-        return redirect('home')
-    else:
-        messages.success(request, "You must be logged in to perform this action.")
-        return redirect('home')
-
-"""def add_passenger(request):
-    form = AddPassengerForm(request.POST or None)
-    if request.user.is_authenticated:
-        if request.method == "POST":
-            if form.is_valid():
-                add_passenger = form.save()
-                messages.success(request, f"Record Added...")
-                return redirect("home")
-        return render(request, 'add_passenger.html', {"form": form})
-    else:
-        messages.success(request, f"You must be logged in...")
-        return redirect("home")"""
-    
-
-"""def add_passenger(request):
-    form = AddPassengerForm(request.POST or None)
-    AddressFormSet = formset_factory(AddPassengerAddressForm)
-    PhoneFormSet = formset_factory(AddPassengerPhoneForm)
-    address_forms = AddressFormSet(request.POST or None, prefix='addresses')
-    phone_forms = PhoneFormSet(request.POST or None, prefix='phones')
-
-    if request.user.is_authenticated:
-        if request.method == "POST":
-            if form.is_valid() and address_forms.is_valid() and phone_forms.is_valid():
-                passenger = form.save(commit=False)
-                passenger.user = request.user
-                passenger.save()
-
-                for address_form in address_forms:
-                    address_form.instance.PASSENGERNUM = passenger
-                    if form.cleaned_data.get('address'):
-                        address = form.save(commit=False)
-                        address.passenger_id = request.POST.get('passenger_number')  # Assuming you're passing passenger number through the form
-                        address.save()
-                    #if address_form.cleaned_data:
-                     #   address_details = address_form.cleaned_data.get('ADDRESSDETAILS')
-                      #  if address_details:
-                       #     PassengerAddress.objects.create(PASSENGERNUM=passenger, ADDRESSDETAILS=address_details)
-
-                for phone_form in phone_forms:
-                    if phone_form.cleaned_data:
-                        phone_number = phone_form.cleaned_data.get('PHONE')
-                        if phone_number:
-                            PassengerPhone.objects.create(PASSENGERNUM=passenger, PHONE=phone_number)
-
-                messages.success(request, "Passenger record added successfully.")
-                return redirect("home")
-
-    else:
-        messages.error(request, "You must be logged in to add a passenger.")
-        return redirect("home")
-
-    return render(request, 'add_passenger.html', {"form": form, "address_formset": address_forms, "phone_formset": phone_forms})
-"""
-
-def add_passenger(request):
-    if request.user.is_authenticated:
-        form = AddPassengerForm(request.POST or None)
-        AddressFormSet = formset_factory(AddPassengerAddressForm)
-        PhoneFormSet = formset_factory(AddPassengerPhoneForm)
-        address_forms = AddressFormSet(request.POST or None, prefix='addresses')
-        phone_forms = PhoneFormSet(request.POST or None, prefix='phones')
-        if request.method == "POST":
-            #data = json.loads(request.body)
-            print(request.body)
-
-            # Extracting data from POST request
-            passenger_num = request.POST.get('PASSENGERNUM')
-            name = request.POST.get('NAME')
-            surname = request.POST.get('SURNAME')
-
-            # Extracting addresses
-            addresses = request.POST.getlist('addresses-0-ADDRESSDETAILS')
-
-            # Extracting phones
-            phones = request.POST.getlist('phones-0-PHONE')
-
-            # Creating and saving Passenger object
-            passenger = Passenger.objects.create(PASSENGERNUM=passenger_num, NAME=name, SURNAME=surname)
-
-            # Creating and saving PassengerAddress objects
-            for address in addresses:
-                PassengerAddress.objects.create(PASSENGERNUM=passenger, ADDRESSDETAILS=address)
-
-            # Creating and saving PassengerPhone objects
-            for phone in phones:
-                PassengerPhone.objects.create(PASSENGERNUM=passenger, PHONE=phone)
-
-            messages.success(request, "Passenger record added successfully.")
-            return redirect("home")
-
-    else:
-        messages.error(request, "You must be logged in to add a passenger.")
-        return redirect("home")
-    return render(request, 'add_passenger.html', {"form": form, "address_formset": address_forms, "phone_formset": phone_forms})
-
-def update_passenger(request, passenger_num):
-	if request.user.is_authenticated:
-		current_record = Passenger.objects.get(PASSENGERNUM=passenger_num)
-		form = AddPassengerForm(request.POST or None, instance=current_record)
-		if form.is_valid():
-			form.save()
-			messages.success(request, "Record Has Been Updated!")
-			return redirect('home')
-		return render(request, 'update_passenger.html', {'form':form})
-	else:
-		messages.success(request, "You Must Be Logged In...")
-		return redirect('home')
-
 #-- Pilot Typeratings --#
 def view_pilot_typeratings(request):
     if request.user.is_authenticated:
@@ -541,90 +794,21 @@ def view_pilot_typerating(request, pilot_num, typerating):
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')
     
-def delete_pilot_typerating(request, pilot_num, typerating):
+#-- Flight Crews --#    
+def view_crews(request):
     if request.user.is_authenticated:
-        delete_it = PilotTypeRating.objects.get(PILOTNUM=pilot_num, TYPERATING=typerating)
-        employee_num = delete_it.PILOTNUM.EMPNUM.EMPNUM
-        delete_it.delete()
-        # Add a success message
-        messages.success(request, f"Pilot type rating deleted...")
-        return redirect(reverse('view_staff_member', kwargs={'employee_num': employee_num}))
-    else:
-        messages.success(request, 'You must be logged in to perform this action.')
-        return redirect('home')
+        crews = FlightCrew.objects.all()
+        return render(request, 'crews.html', {'crews': crews})
 
-def add_pilot_typerating(request, employee_num):
+def view_crew(request, flight_num, employee_num):
     if request.user.is_authenticated:
-        pilot = Pilot.objects.get(EMPNUM=employee_num)
-        form = AddPilotTypeRatingForm(request.POST or None, initial={'PILOTNUM': pilot.PILOTNUM})
-        if request.method == "POST":
-            if form.is_valid():
-                typerating = form.save(commit=False)
-                typerating.PILOTNUM = pilot
-                typerating.save()
-                messages.success(request, f"Typerating Added...")
-                return redirect(reverse('view_staff_member', kwargs={'employee_num': employee_num}))
-        return render(request, 'add_pilot_typerating.html', {"form": form})
-    else:
-        messages.success(request, f"You must be logged in...")
-        return redirect("home")
-
-#-- Pilots --#    
-def view_pilots(request):
-    if request.user.is_authenticated:
-        pilots = Pilot.objects.all()
-        return render(request, 'pilots.html', {'pilots': pilots})
-
-def view_pilot(request, pilot_num):
-    if request.user.is_authenticated:
-        # Look up pilot
-        pilot = Pilot.objects.get(PILOTNUM=pilot_num)
-        # Get all type ratings for the pilot
-        typeratings = PilotTypeRating.objects.filter(PILOTNUM=pilot)
-        addresses = StaffAddress.objects.filter(EMPNUM=pilot.EMPNUM)
-        phones = StaffPhone.objects.filter(EMPNUM=pilot.EMPNUM)
-        flights = Flight.objects.filter(PILOTNUM=pilot_num)
-        return render(request, 'pilot_details.html', {'pilot': pilot, 'typeratings': typeratings, 'addresses': addresses, 'phones': phones, 'flights': flights})
+        #look up city
+        crew = FlightCrew.objects.get(FLIGHTNUM=flight_num, EMPNUM=employee_num)
+        return render(request, 'crew_details.html', {'crew':crew})
     else:
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')
     
-def delete_pilot(request, pilot_num):
-    if request.user.is_authenticated:
-        delete_it = Pilot.objects.get(PILOTNUM=pilot_num)
-        delete_it.delete()
-        messages.success(request, f"Pilot with pilot number {pilot_num} Deleted Successfully")
-        return redirect('home')
-    else:
-        messages.success(request, "You must be logged in to perform this action.")
-        return redirect('home')
-
-def add_pilot(request):
-    form = AddPilotForm(request.POST or None)
-    if request.user.is_authenticated:
-        if request.method == "POST":
-            if form.is_valid():
-                add_pilot = form.save()
-                messages.success(request, f"Record Added...")
-                return redirect("home")
-        return render(request, 'add_pilot.html', {"form": form})
-    else:
-        messages.success(request, f"You must be logged in...")
-        return redirect("home")
-    
-def update_pilot(request, pilot_num):
-	if request.user.is_authenticated:
-		current_record = Pilot.objects.get(PILOTNUM=pilot_num)
-		form = AddPilotForm(request.POST or None, instance=current_record)
-		if form.is_valid():
-			form.save()
-			messages.success(request, "Record Has Been Updated!")
-			return redirect('home')
-		return render(request, 'update_pilot.html', {'form':form})
-	else:
-		messages.success(request, "You Must Be Logged In...")
-		return redirect('home')
-
 #-- Staff Addresses --#
 def view_staff_addresses(request):
     if request.user.is_authenticated:
@@ -639,35 +823,7 @@ def view_staff_address(request, emp_num, address):
     else:
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')
-    
-def delete_staff_address(request, employee_num, address):
-    if request.user.is_authenticated:
-        # Get the FlightCrew object with the given flight number and employee number
-        delete_it = StaffAddress.objects.get(EMPNUM=employee_num, ADDRESSDETAILS=address)
-        # Delete the FlightCrew object
-        delete_it.delete()
-        messages.success(request, "Address Removed...")
-        return redirect(reverse('view_staff_member', kwargs={'employee_num': employee_num}))
-    else:
-        # Add a message for unauthenticated users
-        messages.error(request, "You must be logged in to perform this action.")
-        return redirect('home')
 
-def add_staff_address(request, employee_num):
-    if request.user.is_authenticated:
-        employee = Staff.objects.get(EMPNUM=employee_num)
-        form = AddStaffAddressForm(request.POST or None, initial={'EMPNUM': employee})
-        if request.method == "POST":
-            if form.is_valid():
-                staff_address = form.save(commit=False)
-                staff_address.EMPNUM = employee
-                staff_address.save()
-                messages.success(request, f"Address Added...")
-                return redirect(reverse('view_staff_member', kwargs={'employee_num': employee_num}))
-        return render(request, 'add_staff_address.html', {"form": form})
-    else:
-        messages.success(request, f"You must be logged in...")
-        return redirect("home")
 
 #-- Staff Phones --#    
 def view_staff_phones(request):
@@ -683,207 +839,3 @@ def view_staff_phone(request, phone):
     else:
         messages.success(request, 'You must be logged in to view this page.')
         return redirect('home')
-    
-def delete_staff_phone(request, phone):
-    if request.user.is_authenticated:
-        delete_it = StaffPhone.objects.get(PHONE=phone)
-        employee_num = delete_it.EMPNUM.EMPNUM
-        delete_it.delete()
-        messages.success(request, "Phone Removed...")
-        return redirect(reverse('view_staff_member', kwargs={'employee_num': employee_num}))
-    else:
-        messages.success(request, "You must be logged in to perform this action.")
-        return redirect('home')
-
-def add_staff_phone(request, employee_num):
-    if request.user.is_authenticated:
-        employee = Staff.objects.get(EMPNUM=employee_num)
-        form = AddStaffPhoneForm(request.POST or None, initial={'EMPNUM': employee})
-        if request.method == "POST":
-            if form.is_valid():
-                staff_phone = form.save(commit=False)
-                staff_phone.EMPNUM = employee
-                staff_phone.save()
-                messages.success(request, f"Phone Added...")
-                return redirect(reverse('view_staff_member', kwargs={'employee_num': employee_num}))
-        return render(request, 'add_staff_phone.html', {"form": form})
-    else:
-        messages.success(request, f"You must be logged in...")
-        return redirect("home")
-    
-#-- Staff --#    
-def view_staff(request):
-    if request.user.is_authenticated:
-        staff = Staff.objects.all()
-        return render(request, 'staff.html', {'staff': staff})
-
-def view_staff_member(request, employee_num):
-    if request.user.is_authenticated:
-        #look up staff_member
-        staff_member = Staff.objects.get(EMPNUM=employee_num)
-        addresses = StaffAddress.objects.filter(EMPNUM=employee_num)
-        phones = StaffPhone.objects.filter(EMPNUM=employee_num)
-        if staff_member.TYPE == 'Crew':
-            flights = Flight.objects.filter(flightcrew__EMPNUM=employee_num)
-            return render(request, 'staff_details.html', {'staff_member': staff_member, 'addresses': addresses, 'phones': phones, 'flights': flights})
-        else:
-            pilot = Pilot.objects.get(EMPNUM=employee_num)
-            # Use the pilotnum to filter the Flight objects
-            flights = Flight.objects.filter(PILOTNUM=pilot.PILOTNUM)
-            typeratings = PilotTypeRating.objects.filter(PILOTNUM=pilot)
-            return render(request, 'staff_details.html', {'staff_member': staff_member, 'addresses': addresses, 'phones': phones, 'flights': flights, 'typeratings': typeratings})
-    else:
-        messages.success(request, 'You must be logged in to view this page.')
-        return redirect('home')
-    
-def delete_staff_member(request, employee_num):
-    if request.user.is_authenticated:
-        delete_it = Staff.objects.get(EMPNUM=employee_num)
-        delete_it.delete()
-        messages.success(request, f"Staff member with employee number {employee_num} Deleted Successfully")
-        return redirect('home')
-    else:
-        messages.success(request, "You must be logged in to perform this action.")
-        return redirect('home')
-
-"""def add_staff_member(request):
-    if request.user.is_authenticated:
-        form = AddStaffForm(request.POST or None)
-        AddressFormSet = formset_factory(AddStaffAddressForm)
-        PhoneFormSet = formset_factory(AddStaffPhoneForm)
-        address_forms = AddressFormSet(request.POST or None, prefix='addresses')
-        phone_forms = PhoneFormSet(request.POST or None, prefix='phones')
-        if request.method == "POST":
-            #data = json.loads(request.body)
-            print(request.body)
-
-            # Extracting data from POST request
-            employee_num = request.POST.get('EMPNUM')
-            name = request.POST.get('NAME')
-            surname = request.POST.get('SURNAME')
-            type = request.POST.get('TYPE')
-            salary = request.POST.get('SALARY')
-
-            # Extracting addresses
-            addresses = request.POST.getlist('addresses-0-ADDRESSDETAILS')
-
-            # Extracting phones
-            phones = request.POST.getlist('phones-0-PHONE')
-
-            # Creating and saving Passenger object
-            staff_member = Staff.objects.create(EMPNUM=employee_num, NAME=name, SURNAME=surname, TYPE=type, SALARY=salary)
-
-            # Creating and saving PassengerAddress objects
-            for address in addresses:
-                StaffAddress.objects.create(EMPNUM=staff_member, ADDRESSDETAILS=address)
-
-            # Creating and saving PassengerPhone objects
-            for phone in phones:
-                StaffPhone.objects.create(EMPNUM=staff_member, PHONE=phone)
-
-            messages.success(request, "Passenger record added successfully.")
-            return redirect("view_staff")"""
-        
-
-def add_staff_member(request):
-    if request.user.is_authenticated:
-        form = AddStaffForm(request.POST or None)
-        AddressFormSet = formset_factory(AddStaffAddressForm)
-        PhoneFormSet = formset_factory(AddStaffPhoneForm)
-        address_forms = AddressFormSet(request.POST or None, prefix='addresses')
-        phone_forms = PhoneFormSet(request.POST or None, prefix='phones')
-        
-        if request.method == "POST":
-            if form.is_valid() and address_forms.is_valid() and phone_forms.is_valid():
-                # Extracting data from POST request
-                employee_num = form.cleaned_data['EMPNUM']
-                name = form.cleaned_data['NAME']
-                surname = form.cleaned_data['SURNAME']
-                type = form.cleaned_data['TYPE']
-                pilot_num = form.cleaned_data['pilotnum']
-                salary = form.cleaned_data['SALARY']
-                
-                # Extracting addresses
-                addresses = request.POST.getlist('addresses-0-ADDRESSDETAILS')
-                
-                # Extracting phones
-                phones = request.POST.getlist('phones-0-PHONE')
-                
-                # Check for duplicate phone numbers
-                existing_phones = StaffPhone.objects.filter(PHONE__in=phones).values_list('PHONE', flat=True)
-                if existing_phones:
-                    messages.error(request, {'PHONE': 'Phone number(s) {} already exist.'.format(', '.join(existing_phones))})
-                else:
-                    # Creating and saving Staff object
-                    staff_member = Staff.objects.create(EMPNUM=employee_num, NAME=name, SURNAME=surname, TYPE=type, SALARY=salary)
-                    if type == 'Pilot':
-                        Pilot.objects.create(EMPNUM=staff_member, PILOTNUM=pilot_num)
-
-                    # Creating and saving StaffAddress objects
-                    for address in addresses:
-                        StaffAddress.objects.create(EMPNUM=staff_member, ADDRESSDETAILS=address)
-
-                    # Creating and saving StaffPhone objects
-                    for phone in phones:
-                        StaffPhone.objects.create(EMPNUM=staff_member, PHONE=phone)
-
-                    messages.success(request, "Staff record added successfully.")
-                    return redirect("view_staff")
-            else:
-                messages.error(request, "Please correct the errors below.")
-
-    else:
-        messages.error(request, "You must be logged in to add a passenger.")
-        return redirect("home")
-    return render(request, 'add_staff_member.html', {"form": form, "address_formset": address_forms, "phone_formset": phone_forms})
-
-def update_staff_member(request, employee_num):
-	if request.user.is_authenticated:
-		current_record = Staff.objects.get(EMPNUM=employee_num)
-		form = AddStaffForm(request.POST or None, instance=current_record)
-		if form.is_valid():
-			form.save()
-			messages.success(request, "Record Has Been Updated!")
-			return redirect('home')
-		return render(request, 'update_staff_member.html', {'form':form})
-	else:
-		messages.success(request, "You Must Be Logged In...")
-		return redirect('home')
-
-#-- Stretch --#    
-def view_stretches(request):
-    if request.user.is_authenticated:
-        stretches = Stretch.objects.all()
-        return render(request, 'stretches.html', {'stretches': stretches})
-
-def view_stretch(request, stretch_num):
-    if request.user.is_authenticated:
-        #look up stretch
-        stretch = Stretch.objects.get(STRETCHNUM=stretch_num)
-        return render(request, 'stretch_details.html', {'stretch':stretch})
-    else:
-        messages.success(request, 'You must be logged in to view this page.')
-        return redirect('home')
-    
-def delete_stretch(request, stretch_num):
-    if request.user.is_authenticated:
-        delete_it = Stretch.objects.get(STRETCHNUM=stretch_num)
-        delete_it.delete()
-        messages.success(request, f"Stretch with stretch number {stretch_num} Deleted Successfully")
-        return redirect('home')
-    else:
-        messages.success(request, "You must be logged in to perform this action.")
-        return redirect('home')
-
-def add_stretch(request):
-    form = AddStretchForm(request.POST or None)
-    if request.user.is_authenticated:
-        if request.method == "POST":
-            if form.is_valid():
-                add_stretch = form.save()
-                messages.success(request, f"Record Added...")
-                return redirect("home")
-        return render(request, 'add_stretch.html', {"form": form})
-    else:
-        messages.success(request, f"You must be logged in...")
-        return redirect("home")

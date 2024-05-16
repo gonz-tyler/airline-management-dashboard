@@ -87,10 +87,10 @@ class StaffPhone(models.Model):
     PHONE = models.CharField(max_length=15, primary_key=True)
     EMPNUM = models.ForeignKey(Staff, on_delete=models.CASCADE)
 
-class Stretch(models.Model):
-    STRETCHNUM = models.IntegerField(primary_key=True)
-    ORIGINCITYCODE = models.ForeignKey(City, on_delete=models.CASCADE, related_name='origin_stretches')
-    DESTCITYCODE = models.ForeignKey(City, on_delete=models.CASCADE, related_name='destination_stretches')
+class IntermediateCity(models.Model):
+    STRETCHNUM = models.AutoField(primary_key=True)
+    INTERMEDIATECITYCODE = models.ForeignKey(City, on_delete=models.CASCADE, related_name='intermediate_stretch_city')
+    #DESTCITYCODE = models.ForeignKey(City, on_delete=models.CASCADE, related_name='destination_stretches')
     FLIGHTNUM = models.ForeignKey(Flight, on_delete=models.CASCADE)
     ARRTIME = models.DateTimeField()
     DEPTIME = models.DateTimeField()

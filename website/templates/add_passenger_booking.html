@@ -2,7 +2,7 @@
 {% block content %}
 
 <div class="col-md-6 offset-md-3">
-    <h1>Add Passenger Booking</h1>
+    <h1>Add Passenger Booking for Flight {{ flight.FLIGHTNUM }}</h1>
     <br>
 
     <form method="POST">
@@ -10,6 +10,7 @@
 
         {{ form.as_p }}
         <br>
+        <a onclick="history.back()" class="btn btn-secondary">Cancel</a>
         <button type="submit" class="btn btn-primary">Add</button>
 
 

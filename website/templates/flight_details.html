@@ -6,21 +6,44 @@
     <div class="card-body">
         <p class="list-group-item">
         <h5>Origin: </h5>{{ flight.ORIGINCITYCODE.CITYCODE }}</p>
-        {% if stretches %}
-        <h5>Stretches: </h5>
-        <ul>
-            {% for stretch in stretches %}
-            <li><a href="{% url 'view_stretch' stretch.STRETCHNUM %}">
-                    {{ stretch.ORIGINCITYCODE.CITYCODE }}
-                    {{ stretch.DESTCITYCODE.CITYCODE }}</a>
-            </li>
-            {% endfor %}
-        </ul>
+        <p class="list-group-item">
+        <h5>Departure Time: </h5>{{ flight.DEPTIME }}</p>
+        <h5>Intermediate Cities: </h5>
+        {% if intermediate_cities %}
+        <table class="table table-hover table-sm">
+            <thead class="">
+                <tr>
+                    <th scope="col">Intermediate City</th>
+                    <th scope="col">Arrival Time</th>
+                    <th scope="col">Departure Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for city in intermediate_cities %}
+                <tr>
+                    <td>{{ city.INTERMEDIATECITYCODE.CITYCODE }} {{ city.INTERMEDIATECITYCODE.CITYNAME }}</td>
+                    <td>{{ city.ARRTIME }}</td>
+                    <td>{{ city.DEPTIME }}</td>
+                    {% if user.is_superuser %}
+                    <td><a href="{% url 'delete_intermediate_city' city.STRETCHNUM %}"
+                            class="btn btn-outline-danger btn-sm">
+                            Remove
+                        </a>
+                    </td>
+                    {% endif %}
+                </tr>
+                {%endfor%}
+            </tbody>
+        </table>
+        {% endif %}
+        {% if user.is_superuser %}
+        <a href="{% url 'add_intermediate_city' flight.FLIGHTNUM %}" class="btn btn-outline-success btn-sm">
+            Add Intermediate City
+        </a>
         {% endif %}
         <p class="list-group-item">
         <h5>Destination: </h5>{{ flight.DESTCITYCODE.CITYCODE }}</p>
-        <p class="list-group-item">
-        <h5>Departure Time: </h5>{{ flight.DEPTIME }}</p>
+
         <p class="list-group-item">
         <h5>Arrival Time: </h5>{{ flight.ARRTIME }}</p>
         <p class="list-group-item">
@@ -30,11 +53,8 @@
         <p class="list-group-item">
         <h5>Plane: </h5><a href="{% url 'view_plane' flight.PLANENUM.SERIALNUM %}">
             {{ flight.PLANENUM.SERIALNUM }} {{ flight.PLANENUM.MANUFACTURER }} {{ flight.PLANENUM.MODEL }}</a></p>
-        {% if crew %}
         <h5>Crew:</h5>
-        <a href="{% url 'add_crew' flight.FLIGHTNUM %}" class="btn btn-outline-success btn-sm">
-            Add Crew
-        </a>
+        {% if crew %}
         <table class="table table-hover table-sm">
             <thead class="">
                 <tr>
@@ -51,21 +71,25 @@
                         </a></td>
                     <td>{{ crew_member.EMPNUM.NAME }}</td>
                     <td>{{ crew_member.EMPNUM.SURNAME }}</td>
+                    {% if user.is_superuser %}
                     <td><a href="{% url 'delete_crew' flight.FLIGHTNUM crew_member.EMPNUM.EMPNUM %}"
                             class="btn btn-outline-danger btn-sm">
                             Remove
                         </a>
                     </td>
+                    {% endif %}
                 </tr>
                 {%endfor%}
             </tbody>
         </table>
         {% endif %}
-        {% if passengers %}
-        <h5>Passengers:</h5>
-        <a href="{% url 'add_passenger_booking' flight.FLIGHTNUM %}" class="btn btn-outline-success btn-sm">
-            Add Passenger
+        {% if user.is_superuser %}
+        <a href="{% url 'add_crew' flight.FLIGHTNUM %}" class="btn btn-outline-success btn-sm">
+            Add Crew
         </a>
+        {% endif %}
+        <h5>Passengers:</h5>
+        {% if passengers %}
         <table class="table table-hover table-sm">
             <thead class="">
                 <tr>
@@ -82,23 +106,25 @@
                         </a></td>
                     <td>{{ passenger.PASSENGERNUM.NAME }}</td>
                     <td>{{ passenger.PASSENGERNUM.SURNAME }}</td>
+                    {% if user.is_superuser %}
                     <td><a href="{% url 'delete_passenger_booking' flight.FLIGHTNUM passenger.PASSENGERNUM.PASSENGERNUM %}"
                             class="btn btn-outline-danger btn-sm">
                             Remove
                         </a>
                     </td>
+                    {% endif %}
                 </tr>
                 {%endfor%}
             </tbody>
         </table>
         {% endif %}
-        {% if typeratings %}
-        <h5>Type Ratings:</h5>
-        <a href="{% url 'add_pilot_typerating' staff_member.EMPNUM %}" class="btn btn-outline-success btn-sm">
-            Add Type Rating
+        {% if user.is_superuser %}
+        <a href="{% url 'add_passenger_booking' flight.FLIGHTNUM %}" class="btn btn-outline-success btn-sm">
+            Add Passenger
         </a>
-
         {% endif %}
+        <br>
+        <br>
         <a href="{% url 'home' %}" class="btn btn-secondary">Back</a>
         {% if user.is_superuser %}
         <a href="{% url 'delete_flight' flight.FLIGHTNUM %}" class="btn btn-danger">Delete</a>

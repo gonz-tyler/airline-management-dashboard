@@ -8,28 +8,46 @@
         <p class="list-group-item"><strong>Surname: </strong>{{ passenger.SURNAME }}</p>
         {% if addresses %}
         <h5>Addresses:</h5>
-        <a href="{% url 'add_passenger_address' passenger.PASSENGERNUM %}" class="btn btn-outline-success btn-sm">
-            Add Address
-        </a>
         <ul>
-            {% for address in addresses %}
-            <li>{{ address.ADDRESSDETAILS }}</li>
-            <a href="{% url 'delete_passenger_address' address.PASSENGERNUM.PASSENGERNUM address.ADDRESSDETAILS|urlencode %}"
-                class="btn btn-danger">Delete</a>
-            {% endfor %}
-        </ul>
-
-        <h5>Phones:</h5>
-        <a href="{% url 'add_passenger_phone' passenger.PASSENGERNUM %}" class="btn btn-outline-success btn-sm">
-            Add Phone
-        </a>
-        <ul>
-            {% for phone in phones %}
-            <li>{{ phone.PHONE }}</li>
+            <table class="table table-hover table-sm">
+                <tbody>
+                    {% for address in addresses %}
+                    <tr>
+                        <td>{{ address.ADDRESSDETAILS }}</td>
+                        {% if user.is_superuser %}
+                        <td><a href="{% url 'delete_passenger_address' address.PASSENGERNUM.PASSENGERNUM address.ADDRESSDETAILS %}"
+                                class="btn btn-danger">Delete</a></td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
             {% if user.is_superuser %}
-            <a href="{% url 'delete_passenger_phone' phone.PHONE %}" class="btn btn-danger">Delete</a>
+            <a href="{% url 'add_passenger_address' passenger.PASSENGERNUM %}" class="btn btn-outline-success btn-sm">
+                Add Address
+            </a>
             {% endif %}
-            {% endfor %}
+        </ul>
+        <h5>Phones:</h5>
+        <ul>
+            <table class="table table-hover table-sm">
+                <tbody>
+                    {% for phone in phones %}
+                    <tr>
+                        <td>{{ phone.PHONE }}</td>
+                        {% if user.is_superuser %}
+                        <td><a href="{% url 'delete_passenger_phone' phone.PHONE %}" class="btn btn-danger">Delete</a>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if user.is_superuser %}
+            <a href="{% url 'add_passenger_phone' passenger.PASSENGERNUM %}" class="btn btn-outline-success btn-sm">
+                Add Phone
+            </a>
+            {% endif %}
         </ul>
         {% endif %}
         {% if bookings %}
