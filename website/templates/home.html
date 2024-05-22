@@ -44,7 +44,7 @@
     </tbody>
 </table>
 {% if user.is_superuser %}
-<a href="admin/auth/user/" class="btn btn-primary add-record-btn" style="max-width: max-content;">
+<a href="{% url 'list_users' %}" class="btn btn-primary add-record-btn" style="max-width: max-content;">
     Admin Management
 </a>
 {% endif %}

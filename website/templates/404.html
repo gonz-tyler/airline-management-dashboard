@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Page Not Found</title>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <style>
+        body {
+            background: #B22222;
+            color: white;
+            font-family: 'Arial', sans-serif;
+            font-size: xx-large;
+        }
+
+        .page-wrap {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .error-container {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .error-code {
+            font-size: 300px;
+            font-weight: bold;
+        }
+
+        .error-icon {
+            font-size: 300px;
+            margin-left: 20px;
+        }
+
+        .lead {
+            margin-top: 20px;
+        }
+
+        .btn-link {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+        }
+
+        .btn-link:hover {
+            text-decoration: underline;
+            color: #ffdfdf;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-wrap">
+        <div class="error-container">
+            <div class="d-flex align-items-center">
+                <div class="error-code">404</div>
+                <div class="error-icon">&#9888;</div>
+            </div>
+            <div class="mb-4 lead">The page you are looking for was not found.</div>
+            <a href="{% url 'home' %}" class="btn btn-link">Back to Home</a>
+        </div>
+    </div>
+</body>
+
+</html>

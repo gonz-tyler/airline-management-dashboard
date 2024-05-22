@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{%block content %}
+
+
+
+{% if user.is_authenticated %}
+
+<head>
+    <title>Confirm Delete</title>
+</head>
+
+<body>
+    <h1>Are you sure you want to delete {{ user.username }}?</h1>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, delete</button>
+        <a href="{% url 'list_users' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</body>
+
+{%endif%}
+{%endblock%}

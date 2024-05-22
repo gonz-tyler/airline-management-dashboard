@@ -1,11 +1,18 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import path
 from .views import *
 
 urlpatterns = [
     path('', home, name='home'),
-    #path('login/', views.login_user, name='login'),
     path('logout/', logout_user, name='logout'),
     path('register/', register_user, name='register'),
+
+    #-- users --#
+    path('users/', UserManagement.list_users, name='list_users'),
+    path('users/add/', UserManagement.add_user, name='add_user'),
+    path('users/edit/<int:user_id>/', UserManagement.edit_user, name='edit_user'),
+    path('users/delete/<int:user_id>/', UserManagement.delete_user, name='delete_user'),
 
     #-- planes --#
     path('planes/', PlaneClass.view_planes, name='view_planes'),
