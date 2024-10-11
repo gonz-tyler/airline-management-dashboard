@@ -38,24 +38,22 @@ To set up the Airline Management System on your local machine, follow these step
    cd airline-management-system
    ```
 2. **Create a virtual environment (optional but recommended)**:
-
-```bash
-python -m venv venv
-source venv/bin/activate   # On Windows use `venv\Scripts\activate`
-```
+   ```bash
+   python -m venv venv
+   source venv/bin/activate   # On Windows use `venv\Scripts\activate`
+   ```
 3. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+5. **Set up the MySQL database**:
 
-```bash
-pip install -r requirements.txt
-```
-4. **Set up the MySQL database**:
-
-- Create a new MySQL database for the project.
-- Update the DATABASES setting in settings.py with your MySQL database credentials.
-- Run migrations:
-    ```bash
-    python manage.py migrate
-    ```
+   - Create a new MySQL database for the project.
+   - Update the DATABASES setting in settings.py with your MySQL database credentials.
+   - Run migrations:
+       ```bash
+       python manage.py migrate
+       ```
 5. **Create a superuser (optional)**:
     ```bash
     python manage.py createsuperuser
