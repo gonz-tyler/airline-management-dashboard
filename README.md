@@ -52,6 +52,7 @@ To set up the Airline Management System on your local machine, follow these step
    - Update the DATABASES setting in settings.py with your MySQL database credentials.
    - Run migrations:
        ```bash
+       python manage.py makemigrations
        python manage.py migrate
        ```
 5. **Create a superuser (optional)**:
