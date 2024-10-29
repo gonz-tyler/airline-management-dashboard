@@ -49,7 +49,14 @@ To set up the Airline Management System on your local machine, follow these step
 5. **Set up the MySQL database**:
 
    - Create a new MySQL database for the project.
-   - Update the DATABASES setting in settings.py with your MySQL database credentials.
+   - Create a `.env` file with your MySQL database credentials.
+        ```bash
+        DB_NAME=<database_name>
+        DB_USER=<database_username(root recommended)>
+        DB_PASSWORD=<database_password>
+        DB_HOST=<database_host(for local use localhost)>
+        DB_PORT=<database_port(default is 3306)>
+        ```
    - Run migrations:
        ```bash
        python manage.py makemigrations
