@@ -11,9 +11,15 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Initialize environment variables
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))  # Load the .env file
 
 
 # Quick-start development settings - unsuitable for production
@@ -25,11 +31,7 @@ SECRET_KEY = 'django-insecure-hr$4i9$8rv2a-=-rdbx)yp@rob_ll8u+f72nqn@o%gz*kh0w5l
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '172.16.0.195',
-]
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -81,11 +83,11 @@ WSGI_APPLICATION = 'airlineManagement.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'airline_database',
-        'USER': 'root',
-        'PASSWORD': 'SoftwareEngineering123!',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'NAME': env('DB_NAME'),
+        'USER': env('DB_USER'),
+        'PASSWORD': env('DB_PASSWORD'),
+        'HOST': env('DB_HOST'),
+        'PORT': env('DB_PORT'),
     }
 }
 
