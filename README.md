@@ -74,7 +74,7 @@ To set up the Airline Management System on your local machine, follow these step
 7. **Access the dashboard**:
    - Open your web browser and navigate to http://127.0.0.1:8000/.
 
-##Usage
+## Usage
 - Log in with your credentials (or create a superuser if you haven't).
 - Navigate through the dashboard to manage flights, planes, passengers, pilots, crew members, and airports.
 ## Contributing
@@ -82,7 +82,7 @@ Contributions are welcome!
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-##Acknowledgements
+## Acknowledgements
  - [Django Documentation](https://docs.djangoproject.com/).
  - [Bootstrap Documentation](https://getbootstrap.com/docs/5.0/getting-started/introduction/))
  - [MySQL Documentation](https://dev.mysql.com/doc/)
