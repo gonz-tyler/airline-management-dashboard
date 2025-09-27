@@ -84,6 +84,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Acknowledgements
  - [Django Documentation](https://docs.djangoproject.com/).
- - [Bootstrap Documentation](https://getbootstrap.com/docs/5.0/getting-started/introduction/))
- - [MySQL Documentation](https://dev.mysql.com/doc/)
+ - [Bootstrap Documentation](https://getbootstrap.com/docs/5.0/getting-started/introduction/).
+ - [MySQL Documentation](https://dev.mysql.com/doc/).
 
