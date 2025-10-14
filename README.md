@@ -14,16 +14,16 @@ A comprehensive web platform for managing airline operations, built with Django 
 The **Airline Management System Dashboard** is a web application built with Django on the backend and HTML with Bootstrap CSS for the frontend. This system provides a complete platform for managing various aspects of an airline, including flights, planes, passengers, pilots, crew members, and airports.
 
 ---
-## 📸 Screenshot
+## Screenshot
 
 > A live screenshot of the main dashboard interface.
-> **(TODO: Replace this link with a real screenshot of your app!)**
+> **(TODO: Replace this link with a real screenshot of app)**
 
 
 `https://i.imgur.com/your-screenshot-url.png`
 
 ---
-## ✨ Features
+## Features
 
 - **User Authentication**: Secure login for administrators to manage airline data.
 - **Flight Management**: Create, read, update, and delete flight information.
@@ -33,7 +33,7 @@ The **Airline Management System Dashboard** is a web application built with Djan
 - **Airport Management**: Manage information about airports served by the airline.
 
 ---
-## 🛠️ Technologies Used
+## Technologies Used
 
 -   **Backend**: Django (Python web framework)
 -   **Frontend**: HTML, Bootstrap CSS
@@ -41,7 +41,7 @@ The **Airline Management System Dashboard** is a web application built with Djan
 -   **Version Control**: Git
 
 ---
-## 🚀 Getting Started
+## Getting Started
 
 To set up the Airline Management System on your local machine, follow these steps.
 
